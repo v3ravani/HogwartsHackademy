@@ -477,6 +477,55 @@
                 </div>
             </div>
             
+            <div class="filters-section">
+                <h2>Filters</h2>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>Doc Type</label>
+                        <select id="filterDocType">
+                            <option value="">All Types</option>
+                            <option value="Receipts">Receipts</option>
+                            <option value="Delivery">Delivery</option>
+                            <option value="Internal">Internal</option>
+                            <option value="Adjustments">Adjustments</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select id="filterStatus">
+                            <option value="">All Status</option>
+                            <option value="Draft">Draft</option>
+                            <option value="Waiting">Waiting</option>
+                            <option value="Ready">Ready</option>
+                            <option value="Done">Done</option>
+                            <option value="Canceled">Canceled</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Warehouse</label>
+                        <select id="filterWarehouse">
+                            <option value="">All Warehouses</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Category</label>
+                        <select id="filterCategory">
+                            <option value="">All Categories</option>
+                        </select>
+                    </div>
+                    <div class="filter-group" style="display: flex; align-items: flex-end;">
+                        <button class="btn-primary" onclick="applyFilters()" style="width: 100%; margin-top: 0;">
+                            Apply Filters
+                        </button>
+                    </div>
+                    <div class="filter-group" style="display: flex; align-items: flex-end;">
+                        <button onclick="resetFilters()" style="width: 100%; margin-top: 0; background: #F1F3F4; color: #202124; border: 1px solid #DADCE0; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='#E8EAED'" onmouseout="this.style.background='#F1F3F4'">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
             <div class="charts-section">
                 <div class="chart-card large">
                     <div class="chart-header">
@@ -560,45 +609,6 @@
                     <div id="notifications"></div>
                 </div>
             </div>
-            
-            <div class="filters-section">
-                <h2>Filters</h2>
-                <div class="filters-grid">
-                    <div class="filter-group">
-                        <label>Doc Type</label>
-                        <select id="filterDocType">
-                            <option value="">All Types</option>
-                            <option value="Receipts">Receipts</option>
-                            <option value="Delivery">Delivery</option>
-                            <option value="Internal">Internal</option>
-                            <option value="Adjustments">Adjustments</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Status</label>
-                        <select id="filterStatus">
-                            <option value="">All Status</option>
-                            <option value="Draft">Draft</option>
-                            <option value="Waiting">Waiting</option>
-                            <option value="Ready">Ready</option>
-                            <option value="Done">Done</option>
-                            <option value="Canceled">Canceled</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Warehouse</label>
-                        <select id="filterWarehouse">
-                            <option value="">All Warehouses</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Category</label>
-                        <select id="filterCategory">
-                            <option value="">All Categories</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -610,11 +620,142 @@
     <script>
         createSidebar('dashboard.html');
         
+        // Global filtered data
+        let filteredProducts = [];
+        let filteredReceipts = [];
+        let filteredDeliveries = [];
+        let filteredTransfers = [];
+        let filteredAdjustments = [];
+        let filteredHistory = [];
+        
+        function getFilteredData() {
+            const docType = document.getElementById('filterDocType')?.value || '';
+            const status = document.getElementById('filterStatus')?.value || '';
+            const warehouse = document.getElementById('filterWarehouse')?.value || '';
+            const category = document.getElementById('filterCategory')?.value || '';
+            
+            // Get all data
+            let products = getProducts();
+            let receipts = getReceipts();
+            let deliveries = getDeliveries();
+            let transfers = getTransfers();
+            let adjustments = getAdjustments();
+            let history = getHistory();
+            
+            // Filter products by warehouse and category
+            if (warehouse) {
+                products = products.filter(p => p.location === warehouse);
+            }
+            if (category) {
+                products = products.filter(p => p.category === category);
+            }
+            
+            // Filter receipts
+            if (status) {
+                receipts = receipts.filter(r => r.status === status);
+            }
+            if (warehouse) {
+                receipts = receipts.filter(r => r.warehouse === warehouse);
+            }
+            if (docType && docType !== 'Receipts') {
+                receipts = [];
+            }
+            
+            // Filter deliveries
+            if (status) {
+                deliveries = deliveries.filter(d => d.status === status);
+            }
+            if (warehouse) {
+                deliveries = deliveries.filter(d => d.warehouse === warehouse);
+            }
+            if (docType && docType !== 'Delivery') {
+                deliveries = [];
+            }
+            
+            // Filter transfers
+            if (status) {
+                transfers = transfers.filter(t => t.status === status);
+            }
+            if (warehouse) {
+                transfers = transfers.filter(t => t.fromLocation === warehouse || t.toLocation === warehouse);
+            }
+            if (docType && docType !== 'Internal') {
+                transfers = [];
+            }
+            
+            // Filter adjustments
+            if (warehouse) {
+                adjustments = adjustments.filter(a => a.location === warehouse);
+            }
+            if (category) {
+                const categoryProductIds = products.map(p => p.id);
+                adjustments = adjustments.filter(a => categoryProductIds.includes(a.productId));
+            }
+            if (docType && docType !== 'Adjustments') {
+                adjustments = [];
+            }
+            
+            // Filter history
+            if (docType) {
+                if (docType === 'Receipts') {
+                    history = history.filter(h => h.type === 'Receipt');
+                } else if (docType === 'Delivery') {
+                    history = history.filter(h => h.type === 'Delivery');
+                } else if (docType === 'Internal') {
+                    history = history.filter(h => h.type === 'Transfer');
+                } else if (docType === 'Adjustments') {
+                    history = history.filter(h => h.type === 'Adjustment');
+                }
+            }
+            if (warehouse) {
+                history = history.filter(h => {
+                    if (typeof h.location === 'string') {
+                        return h.location.includes(warehouse);
+                    }
+                    return false;
+                });
+            }
+            
+            // Filter products based on doc type (if products are in filtered receipts/deliveries/transfers)
+            // Only filter by doc type if a specific doc type is selected
+            if (docType) {
+                const relevantProductIds = new Set();
+                
+                if (docType === 'Receipts') {
+                    receipts.forEach(r => {
+                        r.products.forEach(p => relevantProductIds.add(p.productId));
+                    });
+                } else if (docType === 'Delivery') {
+                    deliveries.forEach(d => {
+                        d.products.forEach(p => relevantProductIds.add(p.productId));
+                    });
+                } else if (docType === 'Internal') {
+                    transfers.forEach(t => {
+                        t.products.forEach(p => relevantProductIds.add(p.productId));
+                    });
+                } else if (docType === 'Adjustments') {
+                    adjustments.forEach(a => relevantProductIds.add(a.productId));
+                }
+                
+                // Only filter products if we have relevant product IDs and doc type is selected
+                if (relevantProductIds.size > 0) {
+                    products = products.filter(p => relevantProductIds.has(p.id));
+                } else if (docType) {
+                    // If doc type is selected but no matching products, show empty
+                    products = [];
+                }
+            }
+            
+            return { products, receipts, deliveries, transfers, adjustments, history };
+        }
+        
         function updateKPIs() {
-            const products = getProducts();
-            const receipts = getReceipts();
-            const deliveries = getDeliveries();
-            const transfers = getTransfers();
+            const { products, receipts, deliveries, transfers } = getFilteredData();
+            
+            filteredProducts = products;
+            filteredReceipts = receipts;
+            filteredDeliveries = deliveries;
+            filteredTransfers = transfers;
             
             const totalProducts = products.reduce((sum, p) => sum + p.stock, 0);
             const lowStock = products.filter(p => p.stock < 10).length;
@@ -627,6 +768,25 @@
             document.getElementById('pendingReceipts').textContent = pendingReceipts;
             document.getElementById('pendingDeliveries').textContent = pendingDeliveries;
             document.getElementById('scheduledTransfers').textContent = scheduledTransfers;
+        }
+        
+        function applyFilters() {
+            updateKPIs();
+            loadRecentActivity();
+            loadQuickStats();
+            loadStockAlerts();
+            loadCharts();
+            loadTopProducts();
+            loadTopCustomers();
+            loadNotifications();
+        }
+        
+        function resetFilters() {
+            document.getElementById('filterDocType').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterWarehouse').value = '';
+            document.getElementById('filterCategory').value = '';
+            applyFilters();
         }
         
         function loadFilters() {
@@ -661,8 +821,8 @@
         }
         
         function loadRecentActivity() {
-            const history = getHistory();
-            const products = getProducts();
+            const { history, products } = getFilteredData();
+            filteredHistory = history;
             const container = document.getElementById('recentActivity');
             
             const recent = history.slice(0, 5);
@@ -705,7 +865,7 @@
         
         function loadQuickStats() {
             const customers = getCustomers();
-            const products = getProducts();
+            const { products } = getFilteredData();
             
             const totalCustomers = customers.length;
             const totalValue = products.reduce((sum, p) => sum + (p.stock * (p.price || 0)), 0);
@@ -717,7 +877,7 @@
         }
         
         function loadStockAlerts() {
-            const products = getProducts();
+            const { products } = getFilteredData();
             const lowStock = products.filter(p => p.stock < 10).slice(0, 5);
             const container = document.getElementById('stockAlerts');
             const countEl = document.getElementById('alertCount');
@@ -742,7 +902,7 @@
         updateKPIs();
         loadFilters();
         function loadCharts() {
-            const products = getProducts();
+            const { products, history } = getFilteredData();
             const categories = getCategories();
             const warehouses = getWarehouses();
             
@@ -765,7 +925,6 @@
             const labels = [];
             const receiptData = [];
             const deliveryData = [];
-            const history = getHistory();
             
             // Generate last 7 days
             for (let i = 6; i >= 0; i--) {
@@ -865,7 +1024,7 @@
         }
         
         function loadTopProducts() {
-            const products = getProducts();
+            const { products } = getFilteredData();
             const topProducts = [...products].sort((a, b) => (b.stock * (b.price || 0)) - (a.stock * (a.price || 0))).slice(0, 5);
             const container = document.getElementById('topProducts');
             
@@ -888,7 +1047,7 @@
         
         function loadTopCustomers() {
             const customers = getCustomers();
-            const deliveries = getDeliveries();
+            const { deliveries } = getFilteredData();
             
             // Calculate customer order counts
             const customerOrders = {};
@@ -940,9 +1099,7 @@
         }
         
         function loadNotifications() {
-            const products = getProducts();
-            const deliveries = getDeliveries();
-            const receipts = getReceipts();
+            const { products, deliveries, receipts } = getFilteredData();
             
             const notifications = [];
             
