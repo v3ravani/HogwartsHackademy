@@ -194,10 +194,13 @@ http://localhost:8080
 
 ## 👥 Contributors
 
-- **Viraj Ravani**
-- **Visha Yadav**
-- **Astha Tiwari**
-- **Kavya Gada**
+- **Viraj Ravani** — [GitHub](https://github.com/v3ravani)
+- **Visha Yadav** — [GitHub](https://github.com/Vishayadav)
+- **Astha Tiwari** — [GitHub](https://github.com/asthatiwari10)
+- **Kavya Gada** — [GitHub](https://github.com/thekavyagada)
+
+Made with ❤️ by Team *Hogwarts Hackedemy*.
+
 
 Made with ❤️ by Team *Hogwarts Hackedemy*.
 
