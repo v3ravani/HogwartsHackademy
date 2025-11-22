@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Adjustment - StockMaster</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #F4F6F9;
+            color: #1F1F1F;
+        }
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        #sidebar {
+            width: 260px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 30px;
+        }
+        .page-header {
+            margin-bottom: 30px;
+        }
+        .page-header h1 {
+            font-size: 28px;
+            color: #1F1F1F;
+        }
+        .form-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 600px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1F1F1F;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #E0E0E0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #1A73E8;
+        }
+        .stock-info {
+            background: #F4F6F9;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .stock-info p {
+            margin: 4px 0;
+            font-size: 14px;
+        }
+        .stock-info .system-stock {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1A73E8;
+            margin-top: 8px;
+        }
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+        .btn-primary {
+            background: #1A73E8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-primary:hover {
+            background: #185ABC;
+        }
+        .btn-secondary {
+            background: #E0E0E0;
+            color: #1F1F1F;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-secondary:hover {
+            background: #D0D0D0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="sidebar"></div>
+        <div class="main-content">
+            <div class="page-header">
+                <h1>Create Stock Adjustment</h1>
+            </div>
+            
+            <div class="form-card">
+                <form id="adjustmentForm" onsubmit="createAdjustment(event)">
+                    <div class="form-group">
+                        <label for="adjustmentProduct">Product *</label>
+                        <select id="adjustmentProduct" name="adjustmentProduct" required onchange="updateSystemStock()">
+                            <option value="">Select Product</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="adjustmentLocation">Location *</label>
+                        <select id="adjustmentLocation" name="adjustmentLocation" required>
+                            <option value="">Select Location</option>
+                        </select>
+                    </div>
+                    <div class="stock-info" id="systemStockInfo" style="display: none;">
+                        <p style="color: #666; font-size: 12px;">System Stock:</p>
+                        <p class="system-stock" id="systemStockValue">0</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="adjustmentCount">Physical Count *</label>
+                        <input type="number" id="adjustmentCount" name="adjustmentCount" min="0" required>
+                        <p style="color: #666; font-size: 12px; margin-top: 4px;">Enter the actual physical count</p>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Save Adjustment</button>
+                        <a href="adjustments.html" class="btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/login.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/adjustments.js"></script>
+    <script>
+        createSidebar('adjustments.html');
+        
+        // Load products and warehouses
+        const products = getProducts();
+        const warehouses = getWarehouses();
+        
+        const productSelect = document.getElementById('adjustmentProduct');
+        products.forEach(product => {
+            const option = document.createElement('option');
+            option.value = product.id;
+            option.textContent = `${product.name} (${product.sku})`;
+            productSelect.appendChild(option);
+        });
+        
+        const locationSelect = document.getElementById('adjustmentLocation');
+        warehouses.forEach(wh => {
+            const option = document.createElement('option');
+            option.value = wh;
+            option.textContent = wh;
+            locationSelect.appendChild(option);
+        });
+        
+        function updateSystemStock() {
+            const productId = parseInt(document.getElementById('adjustmentProduct').value);
+            const stockInfo = document.getElementById('systemStockInfo');
+            const stockValue = document.getElementById('systemStockValue');
+            
+            if (productId) {
+                const product = products.find(p => p.id === productId);
+                if (product) {
+                    stockValue.textContent = `${product.stock} ${product.unit}`;
+                    stockInfo.style.display = 'block';
+                }
+            } else {
+                stockInfo.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
+

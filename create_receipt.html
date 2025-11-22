@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Receipt - StockMaster</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #F4F6F9;
+            color: #1F1F1F;
+        }
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        #sidebar {
+            width: 260px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 30px;
+        }
+        .page-header {
+            margin-bottom: 30px;
+        }
+        .page-header h1 {
+            font-size: 28px;
+            color: #1F1F1F;
+        }
+        .form-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 700px;
+        }
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #F4F6F9;
+        }
+        .form-section:last-child {
+            border-bottom: none;
+        }
+        .form-section h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #1F1F1F;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1F1F1F;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #E0E0E0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #1A73E8;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr auto;
+            gap: 12px;
+            align-items: end;
+        }
+        .btn-primary {
+            background: #1A73E8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-primary:hover {
+            background: #185ABC;
+        }
+        .btn-secondary {
+            background: #E0E0E0;
+            color: #1F1F1F;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-secondary:hover {
+            background: #D0D0D0;
+        }
+        #receiptProductsList {
+            margin-top: 16px;
+            min-height: 100px;
+        }
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="sidebar"></div>
+        <div class="main-content">
+            <div class="page-header">
+                <h1>Create Receipt</h1>
+            </div>
+            
+            <div class="form-card">
+                <form id="receiptForm" onsubmit="createReceipt(event)">
+                    <div class="form-section">
+                        <h2>1. Supplier Information</h2>
+                        <div class="form-group">
+                            <label for="receiptSupplier">Supplier Name *</label>
+                            <input type="text" id="receiptSupplier" name="receiptSupplier" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="receiptWarehouse">Warehouse *</label>
+                            <select id="receiptWarehouse" name="receiptWarehouse" required>
+                                <option value="">Select Warehouse</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h2>2. Add Products</h2>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="receiptProduct">Product</label>
+                                <select id="receiptProduct" name="receiptProduct">
+                                    <option value="">Select Product</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="receiptQuantity">Quantity</label>
+                                <input type="number" id="receiptQuantity" name="receiptQuantity" min="1" value="1">
+                            </div>
+                            <button type="button" class="btn-primary" onclick="addProductToReceipt()" style="margin-bottom: 0;">Add</button>
+                        </div>
+                        <div id="receiptProductsList"></div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Validate & Save Receipt</button>
+                        <a href="receipts.html" class="btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/login.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/receipts.js"></script>
+    <script>
+        createSidebar('receipts.html');
+        window.receiptProducts = [];
+        
+        // Load products and warehouses
+        const products = getProducts();
+        const warehouses = getWarehouses();
+        
+        const productSelect = document.getElementById('receiptProduct');
+        products.forEach(product => {
+            const option = document.createElement('option');
+            option.value = product.id;
+            option.textContent = `${product.name} (${product.sku})`;
+            productSelect.appendChild(option);
+        });
+        
+        const warehouseSelect = document.getElementById('receiptWarehouse');
+        warehouses.forEach(wh => {
+            const option = document.createElement('option');
+            option.value = wh;
+            option.textContent = wh;
+            warehouseSelect.appendChild(option);
+        });
+        
+        updateReceiptProductList();
+    </script>
+</body>
+</html>
+

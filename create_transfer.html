@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Transfer - StockMaster</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #F4F6F9;
+            color: #1F1F1F;
+        }
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        #sidebar {
+            width: 260px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 30px;
+        }
+        .page-header {
+            margin-bottom: 30px;
+        }
+        .page-header h1 {
+            font-size: 28px;
+            color: #1F1F1F;
+        }
+        .form-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 700px;
+        }
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #F4F6F9;
+        }
+        .form-section:last-child {
+            border-bottom: none;
+        }
+        .form-section h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #1F1F1F;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1F1F1F;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #E0E0E0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #1A73E8;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr auto;
+            gap: 12px;
+            align-items: end;
+        }
+        .btn-primary {
+            background: #1A73E8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-primary:hover {
+            background: #185ABC;
+        }
+        .btn-secondary {
+            background: #E0E0E0;
+            color: #1F1F1F;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-secondary:hover {
+            background: #D0D0D0;
+        }
+        #transferProductsList {
+            margin-top: 16px;
+            min-height: 100px;
+        }
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+        .location-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .stock-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="sidebar"></div>
+        <div class="main-content">
+            <div class="page-header">
+                <h1>Create Internal Transfer</h1>
+            </div>
+            
+            <div class="form-card">
+                <form id="transferForm" onsubmit="createTransfer(event)">
+                    <div class="form-section">
+                        <h2>1. Transfer Locations</h2>
+                        <div class="location-row">
+                            <div class="form-group">
+                                <label for="transferFrom">From Location *</label>
+                                <select id="transferFrom" name="transferFrom" required onchange="updateProductList()">
+                                    <option value="">Select Location</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="transferTo">To Location *</label>
+                                <select id="transferTo" name="transferTo" required>
+                                    <option value="">Select Location</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h2>2. Add Products</h2>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="transferProduct">Product</label>
+                                <select id="transferProduct" name="transferProduct" onchange="updateTransferStockInfo()">
+                                    <option value="">Select Product</option>
+                                </select>
+                                <div class="stock-info" id="transferStockInfo"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="transferQuantity">Quantity</label>
+                                <input type="number" id="transferQuantity" name="transferQuantity" min="1" value="1">
+                            </div>
+                            <button type="button" class="btn-primary" onclick="addProductToTransfer()" style="margin-bottom: 0;">Add</button>
+                        </div>
+                        <div id="transferProductsList"></div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Validate & Save Transfer</button>
+                        <a href="transfers.html" class="btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/login.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/transfers.js"></script>
+    <script>
+        createSidebar('transfers.html');
+        window.transferProducts = [];
+        
+        // Load warehouses
+        const warehouses = getWarehouses();
+        const fromSelect = document.getElementById('transferFrom');
+        const toSelect = document.getElementById('transferTo');
+        
+        warehouses.forEach(wh => {
+            const option1 = document.createElement('option');
+            option1.value = wh;
+            option1.textContent = wh;
+            fromSelect.appendChild(option1);
+            
+            const option2 = document.createElement('option');
+            option2.value = wh;
+            option2.textContent = wh;
+            toSelect.appendChild(option2);
+        });
+        
+        function updateProductList() {
+            const fromLocation = document.getElementById('transferFrom').value;
+            const productSelect = document.getElementById('transferProduct');
+            const products = getProducts();
+            
+            // Clear existing options except the first one
+            productSelect.innerHTML = '<option value="">Select Product</option>';
+            
+            if (fromLocation) {
+                products.forEach(product => {
+                    if (product.location === fromLocation && product.stock > 0) {
+                        const option = document.createElement('option');
+                        option.value = product.id;
+                        option.textContent = `${product.name} (Stock: ${product.stock})`;
+                        productSelect.appendChild(option);
+                    }
+                });
+            }
+        }
+        
+        function updateTransferStockInfo() {
+            const productId = parseInt(document.getElementById('transferProduct').value);
+            const fromLocation = document.getElementById('transferFrom').value;
+            const stockInfo = document.getElementById('transferStockInfo');
+            const products = getProducts();
+            
+            if (productId && fromLocation) {
+                const product = products.find(p => p.id === productId && p.location === fromLocation);
+                if (product) {
+                    stockInfo.textContent = `Available at ${fromLocation}: ${product.stock} ${product.unit}`;
+                    stockInfo.style.color = product.stock < 10 ? '#D32F2F' : '#1DB954';
+                } else {
+                    stockInfo.textContent = 'Product not available at this location';
+                    stockInfo.style.color = '#D32F2F';
+                }
+            } else {
+                stockInfo.textContent = '';
+            }
+        }
+        
+        updateTransferProductList();
+    </script>
+</body>
+</html>
+

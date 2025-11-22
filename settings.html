@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - StockMaster</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #F4F6F9;
+            color: #1F1F1F;
+        }
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        #sidebar {
+            width: 260px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 30px;
+        }
+        .page-header {
+            margin-bottom: 30px;
+        }
+        .page-header h1 {
+            font-size: 28px;
+            color: #1F1F1F;
+        }
+        .settings-section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .settings-section h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #1F1F1F;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1F1F1F;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #E0E0E0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #1A73E8;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+        }
+        .btn-primary {
+            background: #1A73E8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-primary:hover {
+            background: #185ABC;
+        }
+        .list-item {
+            background: #F4F6F9;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .list-item span {
+            font-size: 14px;
+            color: #1F1F1F;
+        }
+        .btn-danger {
+            background: #D32F2F;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-danger:hover {
+            background: #B71C1C;
+        }
+        .empty-state {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="sidebar"></div>
+        <div class="main-content">
+            <div class="page-header">
+                <h1>Settings</h1>
+            </div>
+            
+            <div class="settings-section">
+                <h2>Warehouses</h2>
+                <div class="form-group">
+                    <div class="form-row">
+                        <input type="text" id="newWarehouse" placeholder="Enter warehouse name (e.g., WH3)">
+                        <button type="button" class="btn-primary" onclick="addWarehouse()">Add Warehouse</button>
+                    </div>
+                </div>
+                <div id="warehousesList"></div>
+            </div>
+            
+            <div class="settings-section">
+                <h2>Categories</h2>
+                <div class="form-group">
+                    <div class="form-row">
+                        <input type="text" id="newCategory" placeholder="Enter category name">
+                        <button type="button" class="btn-primary" onclick="addCategory()">Add Category</button>
+                    </div>
+                </div>
+                <div id="categoriesList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/login.js"></script>
+    <script src="js/navigation.js"></script>
+    <script>
+        createSidebar('settings.html');
+        
+        function loadWarehouses() {
+            const warehouses = getWarehouses();
+            const container = document.getElementById('warehousesList');
+            
+            if (warehouses.length === 0) {
+                container.innerHTML = '<div class="empty-state">No warehouses added yet</div>';
+                return;
+            }
+            
+            container.innerHTML = warehouses.map(wh => `
+                <div class="list-item">
+                    <span>${wh}</span>
+                    <button class="btn-danger" onclick="removeWarehouseItem('${wh}')">Delete</button>
+                </div>
+            `).join('');
+        }
+        
+        function loadCategories() {
+            const categories = getCategories();
+            const container = document.getElementById('categoriesList');
+            
+            if (categories.length === 0) {
+                container.innerHTML = '<div class="empty-state">No categories added yet</div>';
+                return;
+            }
+            
+            container.innerHTML = categories.map(cat => `
+                <div class="list-item">
+                    <span>${cat}</span>
+                    <button class="btn-danger" onclick="removeCategoryItem('${cat}')">Delete</button>
+                </div>
+            `).join('');
+        }
+        
+        function addWarehouse() {
+            const input = document.getElementById('newWarehouse');
+            const name = input.value.trim();
+            
+            if (!name) {
+                alert('Please enter a warehouse name');
+                return;
+            }
+            
+            addWarehouse(name);
+            input.value = '';
+            loadWarehouses();
+        }
+        
+        function addCategory() {
+            const input = document.getElementById('newCategory');
+            const name = input.value.trim();
+            
+            if (!name) {
+                alert('Please enter a category name');
+                return;
+            }
+            
+            addCategory(name);
+            input.value = '';
+            loadCategories();
+        }
+        
+        function removeWarehouseItem(name) {
+            if (confirm(`Are you sure you want to delete warehouse "${name}"?`)) {
+                removeWarehouse(name);
+                loadWarehouses();
+            }
+        }
+        
+        function removeCategoryItem(name) {
+            if (confirm(`Are you sure you want to delete category "${name}"?`)) {
+                removeCategory(name);
+                loadCategories();
+            }
+        }
+        
+        loadWarehouses();
+        loadCategories();
+    </script>
+</body>
+</html>
+
