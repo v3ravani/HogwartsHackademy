@@ -1,92 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Verify OTP - StockMaster</title>
-    <style>
-        body{font-family:Arial,Helvetica,sans-serif;background:#f5f6f8;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
-        .card{background:white;padding:28px;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,0.08);width:100%;max-width:420px}
-        .card h2{margin:0 0 12px 0;color:#1A73E8}
-        .form-group{margin-bottom:12px}
-        input{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px}
-        .btn{display:inline-block;padding:12px 18px;background:#1A73E8;color:white;border-radius:8px;border:none;cursor:pointer}
-        .msg{margin-top:12px;color:#c5221f;display:none}
-    </style>
+  <meta charset="utf-8">
+  <meta http-equiv="refresh" content="0; url=login.html">
+  <title>OTP removed</title>
 </head>
 <body>
-    <div class="card">
-        <h2>Enter OTP</h2>
-        <p>An OTP was sent to your registered email. Enter it below to complete login.</p>
-        <div class="form-group">
-            <input type="text" id="otpInput" placeholder="6-digit code" maxlength="6">
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-            <button id="verifyBtn" class="btn">Verify</button>
-            <button id="resendBtn" class="btn" style="background:#f1f3f4;color:#202124">Resend</button>
-        </div>
-        <div class="msg" id="msg"></div>
-    </div>
-
-    <script>
-        const user = sessionStorage.getItem('stockmaster_pending_user');
-        if (!user) {
-            window.location.href = 'login.html';
-        }
-        document.getElementById('verifyBtn').addEventListener('click', async () => {
-            const otp = document.getElementById('otpInput').value.trim();
-            const msg = document.getElementById('msg');
-            msg.style.display = 'none';
-            try {
-                const res = await fetch('server/verify_otp.php', { method: 'POST', credentials: 'same-origin', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ user_id: user, otp }) });
-                const ct = res.headers.get('content-type') || '';
-                let json;
-                if (ct.includes('application/json')) {
-                    try {
-                        json = await res.json();
-                    } catch (e) {
-                        const text = await res.text();
-                        msg.textContent = 'Server returned malformed JSON';
-                        msg.style.display = 'block';
-                        console.error('Malformed JSON from verify_otp.php:', text);
-                        return;
-                    }
-                } else {
-                    const text = await res.text();
-                    msg.textContent = 'Server did not return JSON. See console for details.';
-                    msg.style.display = 'block';
-                    console.error('Expected JSON from verify_otp.php but got:', text);
-                    return;
-                }
-                if (json.success) {
-                    // mark client as authenticated for legacy JS
-                    localStorage.setItem('stockmaster_authenticated', 'true');
-                    localStorage.setItem('stockmaster_user', user);
-                    sessionStorage.removeItem('stockmaster_pending_user');
-                    window.location.href = 'dashboard.html';
-                    return;
-                }
-                msg.textContent = json.message || 'Invalid OTP';
-                msg.style.display = 'block';
-            } catch (err) {
-                msg.textContent = 'Network error';
-                msg.style.display = 'block';
-            }
-        });
-
-        document.getElementById('resendBtn').addEventListener('click', async () => {
-            const msg = document.getElementById('msg');
-            msg.style.display = 'none';
-            try {
-                const res = await fetch('server/resend_otp.php', { method: 'POST', credentials: 'same-origin', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ user_id: user }) });
-                const json = await res.json();
-                msg.textContent = json.message || 'OTP resent';
-                msg.style.display = 'block';
-            } catch (err) {
-                msg.textContent = 'Network error';
-                msg.style.display = 'block';
-            }
-        });
-    </script>
+  <p>OTP functionality has been removed. Redirecting to <a href="login.html">login</a>...</p>
 </body>
 </html>

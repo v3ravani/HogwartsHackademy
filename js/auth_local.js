@@ -34,11 +34,15 @@ async function localRegister({ user_id, password, name = '', email = '' }) {
     return { success: true, message: 'Account created (local)' };
 }
 
-async function localLogin({ user_id, password }) {
+async function localLogin({ user_id, password, email = '' }) {
     if (!user_id || !password) return { success: false, message: 'Missing credentials' };
     const users = getStoredUsers();
     const user = users[user_id];
     if (!user) return { success: false, message: 'Invalid credentials (local)' };
+    // If email provided, ensure it matches stored email
+    if (email && user.email && String(email).toLowerCase() !== String(user.email).toLowerCase()) {
+        return { success: false, message: 'Email does not match (local)' };
+    }
     const hash = await hashPassword(password);
     if (hash !== user.hash) return { success: false, message: 'Invalid credentials (local)' };
     try {

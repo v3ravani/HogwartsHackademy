@@ -1,6 +1,8 @@
-# StockMaster — Auth setup and OTP testing
+# StockMaster — Auth setup and (legacy) OTP notes
 
-This guide explains how to set up and test the MySQL + PHP authentication (signup/login with OTP) locally using XAMPP. It also explains the developer-only OTP retrieval endpoint for testing when email isn't configured.
+NOTE: OTP functionality has been removed from this codebase. The server now supports simple username/password login. The sections below refer to legacy OTP features; related endpoints have been disabled.
+
+This guide explains how to set up and test the MySQL + PHP authentication locally using XAMPP.
 
 ## 1) Import database schema
 - Open phpMyAdmin or use the MySQL CLI and import `database_schema.sql`.
