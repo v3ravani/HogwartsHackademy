@@ -5,28 +5,198 @@
 function initializeData() {
     if (!localStorage.getItem('stockmaster_products')) {
         localStorage.setItem('stockmaster_products', JSON.stringify([
-            { id: 1, name: 'Laptop Dell XPS', sku: 'LAP-DELL-001', category: 'Electronics', unit: 'Unit', stock: 45, location: 'WH1', price: 1299.99 },
+            { id: 1, name: 'Laptop Dell XPS', sku: 'LAP-DELL-001', category: 'Electronics', unit: 'Unit', stock: 77, location: 'WH1', price: 1299.99 },
             { id: 2, name: 'Wireless Mouse', sku: 'ACC-MSE-001', category: 'Accessories', unit: 'Unit', stock: 120, location: 'WH1', price: 29.99 },
             { id: 3, name: 'USB-C Cable', sku: 'ACC-CBL-001', category: 'Accessories', unit: 'Unit', stock: 8, location: 'WH2', price: 19.99 },
-            { id: 4, name: 'Monitor 27"', sku: 'MON-27-001', category: 'Electronics', unit: 'Unit', stock: 25, location: 'WH1', price: 399.99 },
-            { id: 5, name: 'Keyboard Mechanical', sku: 'ACC-KBD-001', category: 'Accessories', unit: 'Unit', stock: 5, location: 'WH2', price: 89.99 }
+            { id: 4, name: 'Monitor 27"', sku: 'MON-27-001', category: 'Electronics', unit: 'Unit', stock: 32, location: 'WH1', price: 399.99 },
+            { id: 5, name: 'Keyboard Mechanical', sku: 'ACC-KBD-001', category: 'Accessories', unit: 'Unit', stock: 5, location: 'WH2', price: 89.99 },
+            { id: 6, name: 'Gaming Mouse', sku: 'ACC-GMS-001', category: 'Accessories', unit: 'Unit', stock: 45, location: 'WH1', price: 79.99 },
+            { id: 7, name: 'HDMI Cable', sku: 'ACC-HDM-001', category: 'Accessories', unit: 'Unit', stock: 150, location: 'WH1', price: 12.99 },
+            { id: 8, name: 'Webcam HD', sku: 'ACC-WBC-001', category: 'Electronics', unit: 'Unit', stock: 30, location: 'WH1', price: 59.99 },
+            { id: 9, name: 'Laptop Stand', sku: 'ACC-LST-001', category: 'Accessories', unit: 'Unit', stock: 3, location: 'WH2', price: 45.99 },
+            { id: 10, name: 'USB Hub', sku: 'ACC-USB-001', category: 'Accessories', unit: 'Unit', stock: 60, location: 'WH1', price: 34.99 },
+            { id: 11, name: 'Monitor 24"', sku: 'MON-24-001', category: 'Electronics', unit: 'Unit', stock: 18, location: 'WH2', price: 249.99 },
+            { id: 12, name: 'Laptop Bag', sku: 'ACC-LBG-001', category: 'Accessories', unit: 'Unit', stock: 25, location: 'WH1', price: 39.99 }
         ]));
     }
     
     if (!localStorage.getItem('stockmaster_receipts')) {
-        localStorage.setItem('stockmaster_receipts', JSON.stringify([]));
+        const now = new Date();
+        localStorage.setItem('stockmaster_receipts', JSON.stringify([
+            {
+                id: 1,
+                supplier: 'Tech Suppliers Inc',
+                warehouse: 'WH1',
+                date: new Date(now - 7 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'Done',
+                products: [
+                    { productId: 1, quantity: 10 },
+                    { productId: 2, quantity: 50 },
+                    { productId: 4, quantity: 5 }
+                ]
+            },
+            {
+                id: 2,
+                supplier: 'Global Electronics',
+                warehouse: 'WH1',
+                date: new Date(now - 5 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'Done',
+                products: [
+                    { productId: 1, quantity: 15 },
+                    { productId: 3, quantity: 30 }
+                ]
+            },
+            {
+                id: 3,
+                supplier: 'Accessories Plus',
+                warehouse: 'WH2',
+                date: new Date(now - 3 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'Done',
+                products: [
+                    { productId: 2, quantity: 70 },
+                    { productId: 5, quantity: 20 }
+                ]
+            },
+            {
+                id: 4,
+                supplier: 'Office Supply Co',
+                warehouse: 'WH1',
+                date: new Date(now - 2 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'Done',
+                products: [
+                    { productId: 4, quantity: 10 },
+                    { productId: 5, quantity: 15 }
+                ]
+            },
+            {
+                id: 5,
+                supplier: 'Tech Distributors',
+                warehouse: 'WH2',
+                date: new Date(now - 1 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'Done',
+                products: [
+                    { productId: 1, quantity: 20 },
+                    { productId: 3, quantity: 25 }
+                ]
+            }
+        ]));
     }
     
     if (!localStorage.getItem('stockmaster_deliveries')) {
-        localStorage.setItem('stockmaster_deliveries', JSON.stringify([]));
+        const now = new Date();
+        localStorage.setItem('stockmaster_deliveries', JSON.stringify([
+            {
+                id: 1,
+                customer: 'Acme Corporation',
+                warehouse: 'WH1',
+                date: new Date(now - 6 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'Done',
+                products: [
+                    { productId: 1, quantity: 5 },
+                    { productId: 2, quantity: 20 }
+                ]
+            },
+            {
+                id: 2,
+                customer: 'Tech Solutions Inc',
+                warehouse: 'WH1',
+                date: new Date(now - 4 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'Done',
+                products: [
+                    { productId: 4, quantity: 3 },
+                    { productId: 5, quantity: 8 }
+                ]
+            },
+            {
+                id: 3,
+                customer: 'John Smith',
+                warehouse: 'WH2',
+                date: new Date(now - 2 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'Done',
+                products: [
+                    { productId: 2, quantity: 5 },
+                    { productId: 3, quantity: 10 }
+                ]
+            },
+            {
+                id: 4,
+                customer: 'Acme Corporation',
+                warehouse: 'WH1',
+                date: new Date(now - 1 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'Done',
+                products: [
+                    { productId: 1, quantity: 8 }
+                ]
+            }
+        ]));
     }
     
     if (!localStorage.getItem('stockmaster_transfers')) {
-        localStorage.setItem('stockmaster_transfers', JSON.stringify([]));
+        const now = new Date();
+        localStorage.setItem('stockmaster_transfers', JSON.stringify([
+            {
+                id: 1,
+                fromLocation: 'WH1',
+                toLocation: 'WH2',
+                date: new Date(now - 5 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'Done',
+                products: [
+                    { productId: 2, quantity: 25 },
+                    { productId: 4, quantity: 3 }
+                ]
+            },
+            {
+                id: 2,
+                fromLocation: 'WH2',
+                toLocation: 'WH1',
+                date: new Date(now - 3 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'Done',
+                products: [
+                    { productId: 3, quantity: 15 }
+                ]
+            },
+            {
+                id: 3,
+                fromLocation: 'WH1',
+                toLocation: 'WH2',
+                date: new Date(now - 1 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'Done',
+                products: [
+                    { productId: 1, quantity: 5 },
+                    { productId: 5, quantity: 10 }
+                ]
+            }
+        ]));
     }
     
     if (!localStorage.getItem('stockmaster_adjustments')) {
-        localStorage.setItem('stockmaster_adjustments', JSON.stringify([]));
+        const now = new Date();
+        localStorage.setItem('stockmaster_adjustments', JSON.stringify([
+            {
+                id: 1,
+                productId: 3,
+                location: 'WH2',
+                physicalCount: 8,
+                systemStock: 10,
+                date: new Date(now - 4 * 24 * 60 * 60 * 1000).toISOString()
+            },
+            {
+                id: 2,
+                productId: 5,
+                location: 'WH2',
+                physicalCount: 5,
+                systemStock: 3,
+                date: new Date(now - 2 * 24 * 60 * 60 * 1000).toISOString()
+            },
+            {
+                id: 3,
+                productId: 2,
+                location: 'WH1',
+                physicalCount: 120,
+                systemStock: 125,
+                date: new Date(now - 1 * 24 * 60 * 60 * 1000).toISOString()
+            }
+        ]));
     }
     
     if (!localStorage.getItem('stockmaster_history')) {
@@ -42,11 +212,159 @@ function initializeData() {
     }
     
     if (!localStorage.getItem('stockmaster_customers')) {
+        const now = new Date();
         localStorage.setItem('stockmaster_customers', JSON.stringify([
-            { id: 1, name: 'Acme Corporation', email: 'contact@acme.com', phone: '+1-555-0101', address: '123 Business St', city: 'New York', country: 'USA', type: 'Corporate', status: 'Active', createdAt: new Date().toISOString() },
-            { id: 2, name: 'Tech Solutions Inc', email: 'info@techsol.com', phone: '+1-555-0102', address: '456 Tech Ave', city: 'San Francisco', country: 'USA', type: 'Corporate', status: 'Active', createdAt: new Date().toISOString() },
-            { id: 3, name: 'John Smith', email: 'john@email.com', phone: '+1-555-0103', address: '789 Main St', city: 'Chicago', country: 'USA', type: 'Individual', status: 'Active', createdAt: new Date().toISOString() }
+            { id: 1, name: 'Acme Corporation', email: 'contact@acme.com', phone: '+1-555-0101', address: '123 Business St', city: 'New York', country: 'USA', type: 'Corporate', status: 'Active', createdAt: new Date(now - 30 * 24 * 60 * 60 * 1000).toISOString() },
+            { id: 2, name: 'Tech Solutions Inc', email: 'info@techsol.com', phone: '+1-555-0102', address: '456 Tech Ave', city: 'San Francisco', country: 'USA', type: 'Corporate', status: 'Active', createdAt: new Date(now - 25 * 24 * 60 * 60 * 1000).toISOString() },
+            { id: 3, name: 'John Smith', email: 'john@email.com', phone: '+1-555-0103', address: '789 Main St', city: 'Chicago', country: 'USA', type: 'Individual', status: 'Active', createdAt: new Date(now - 20 * 24 * 60 * 60 * 1000).toISOString() },
+            { id: 4, name: 'Global Systems Ltd', email: 'sales@globalsys.com', phone: '+1-555-0201', address: '321 Corporate Blvd', city: 'Los Angeles', country: 'USA', type: 'Corporate', status: 'Active', createdAt: new Date(now - 18 * 24 * 60 * 60 * 1000).toISOString() },
+            { id: 5, name: 'Sarah Johnson', email: 'sarah.j@email.com', phone: '+1-555-0202', address: '555 Oak Street', city: 'Boston', country: 'USA', type: 'Individual', status: 'Active', createdAt: new Date(now - 15 * 24 * 60 * 60 * 1000).toISOString() },
+            { id: 6, name: 'Innovation Labs', email: 'info@inno-labs.com', phone: '+1-555-0203', address: '789 Innovation Drive', city: 'Seattle', country: 'USA', type: 'Corporate', status: 'Active', createdAt: new Date(now - 12 * 24 * 60 * 60 * 1000).toISOString() },
+            { id: 7, name: 'Mike Williams', email: 'mike.w@email.com', phone: '+1-555-0204', address: '222 Elm Avenue', city: 'Austin', country: 'USA', type: 'Individual', status: 'Active', createdAt: new Date(now - 10 * 24 * 60 * 60 * 1000).toISOString() }
         ]));
+    }
+    
+    // Initialize history with mock data if empty
+    if (!localStorage.getItem('stockmaster_history') || JSON.parse(localStorage.getItem('stockmaster_history') || '[]').length === 0) {
+        const now = new Date();
+        const history = [
+            {
+                id: 1,
+                type: 'Receipt',
+                productId: [1, 2, 4],
+                quantity: 65,
+                location: 'WH1',
+                timestamp: new Date(now - 7 * 24 * 60 * 60 * 1000).toISOString(),
+                details: 'Receipt #1 from Tech Suppliers Inc'
+            },
+            {
+                id: 2,
+                type: 'Delivery',
+                productId: [1, 2],
+                quantity: 25,
+                location: 'WH1',
+                timestamp: new Date(now - 6 * 24 * 60 * 60 * 1000).toISOString(),
+                details: 'Delivery #1 to Acme Corporation'
+            },
+            {
+                id: 3,
+                type: 'Receipt',
+                productId: [1, 3],
+                quantity: 45,
+                location: 'WH1',
+                timestamp: new Date(now - 5 * 24 * 60 * 60 * 1000).toISOString(),
+                details: 'Receipt #2 from Global Electronics'
+            },
+            {
+                id: 4,
+                type: 'Transfer',
+                productId: [2, 4],
+                quantity: 28,
+                location: 'WH1 → WH2',
+                timestamp: new Date(now - 5 * 24 * 60 * 60 * 1000).toISOString(),
+                details: 'Transfer #1'
+            },
+            {
+                id: 5,
+                type: 'Delivery',
+                productId: [4, 5],
+                quantity: 11,
+                location: 'WH1',
+                timestamp: new Date(now - 4 * 24 * 60 * 60 * 1000).toISOString(),
+                details: 'Delivery #2 to Tech Solutions Inc'
+            },
+            {
+                id: 6,
+                type: 'Adjustment',
+                productId: 3,
+                quantity: -2,
+                location: 'WH2',
+                timestamp: new Date(now - 4 * 24 * 60 * 60 * 1000).toISOString(),
+                details: 'Adjustment #1: System 10 → Physical 8 (-2)'
+            },
+            {
+                id: 7,
+                type: 'Receipt',
+                productId: [2, 5],
+                quantity: 90,
+                location: 'WH2',
+                timestamp: new Date(now - 3 * 24 * 60 * 60 * 1000).toISOString(),
+                details: 'Receipt #3 from Accessories Plus'
+            },
+            {
+                id: 8,
+                type: 'Transfer',
+                productId: [3],
+                quantity: 15,
+                location: 'WH2 → WH1',
+                timestamp: new Date(now - 3 * 24 * 60 * 60 * 1000).toISOString(),
+                details: 'Transfer #2'
+            },
+            {
+                id: 9,
+                type: 'Delivery',
+                productId: [2, 3],
+                quantity: 15,
+                location: 'WH2',
+                timestamp: new Date(now - 2 * 24 * 60 * 60 * 1000).toISOString(),
+                details: 'Delivery #3 to John Smith'
+            },
+            {
+                id: 10,
+                type: 'Receipt',
+                productId: [4, 5],
+                quantity: 25,
+                location: 'WH1',
+                timestamp: new Date(now - 2 * 24 * 60 * 60 * 1000).toISOString(),
+                details: 'Receipt #4 from Office Supply Co'
+            },
+            {
+                id: 11,
+                type: 'Adjustment',
+                productId: 5,
+                quantity: 2,
+                location: 'WH2',
+                timestamp: new Date(now - 2 * 24 * 60 * 60 * 1000).toISOString(),
+                details: 'Adjustment #2: System 3 → Physical 5 (+2)'
+            },
+            {
+                id: 12,
+                type: 'Receipt',
+                productId: [1, 3],
+                quantity: 45,
+                location: 'WH2',
+                timestamp: new Date(now - 1 * 24 * 60 * 60 * 1000).toISOString(),
+                details: 'Receipt #5 from Tech Distributors'
+            },
+            {
+                id: 13,
+                type: 'Transfer',
+                productId: [1, 5],
+                quantity: 15,
+                location: 'WH1 → WH2',
+                timestamp: new Date(now - 1 * 24 * 60 * 60 * 1000).toISOString(),
+                details: 'Transfer #3'
+            },
+            {
+                id: 14,
+                type: 'Delivery',
+                productId: [1],
+                quantity: 8,
+                location: 'WH1',
+                timestamp: new Date(now - 1 * 24 * 60 * 60 * 1000).toISOString(),
+                details: 'Delivery #4 to Acme Corporation'
+            },
+            {
+                id: 15,
+                type: 'Adjustment',
+                productId: 2,
+                quantity: -5,
+                location: 'WH1',
+                timestamp: new Date(now - 1 * 24 * 60 * 60 * 1000).toISOString(),
+                details: 'Adjustment #3: System 125 → Physical 120 (-5)'
+            }
+        ];
+        localStorage.setItem('stockmaster_history', JSON.stringify(history));
     }
 }
 
