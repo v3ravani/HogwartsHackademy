@@ -2,12 +2,12 @@
 
 ## 📌 Introduction
 
-live: https://hogwartshackademy.netlify.app/signup
+live: (https://jocular-pastelito-3beaea.netlify.app/
 
 StockMaster is a lightweight, fast, and modern stock & inventory management system designed for small businesses, local shops, and personal stock tracking.  
 It offers clean UI, smooth navigation, and essential stock management features without unnecessary complexity.  
 The system uses **MySQL** for backend data storage and **LocalStorage** for lightweight client-side caching.
-live: https://hogwartshackademy.netlify.app/signup
+
 ---
 
 
