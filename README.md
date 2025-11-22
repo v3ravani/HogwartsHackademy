@@ -1,265 +1,203 @@
-# 📦 StockMaster — Inventory Management System
+# StockMaster — A Modern Stock & Inventory Management System
 
-StockMaster is a modern, lightweight, and efficient Inventory Management System designed to help small and medium businesses manage stock operations smoothly.
-It includes product management, receipts, deliveries, transfers, adjustments, analytics, and a complete movement history — all presented through a clean, intuitive UI.
-
+## 📌 Introduction
+StockMaster is a lightweight, fast, and modern stock & inventory management system designed for small businesses, local shops, and personal stock tracking.  
+It offers clean UI, smooth navigation, and essential stock management features without unnecessary complexity.  
+The system uses **MySQL** for backend data storage and **LocalStorage** for lightweight client-side caching.
 ---
+
 
 ## 📑 Index
 
-1. Introduction
-2. Tech Stack
-3. Features
-4. System Architecture & Database Schema
-5. How to Setup
-6. Screenshots
+1. Introduction  
+2. Tech Stack  
+3. Features  
+4. System Architecture & Database Schema  
+5. How to Setup  
+6. Screenshots  
 7. Contributors
 
 ---
 
-## Introduction
+## 🛠️ Tech Stack
 
-StockMaster is built for businesses that need an easy-to-use inventory tool without complex enterprise overhead.
-With fast UI, modular structure, and MySQL backend, StockMaster helps track stock efficiently across products, warehouses, deliveries, receipts, and adjustments.
+**Frontend**
+- HTML5  
+- CSS3 (Modern utility-first styling + custom components)
+- JavaScript (Vanilla JS + modular architecture)
+
+**Backend**
+- PHP (API + server-side logic)
+- MySQL (database for products, sales, categories, logs)
+
+**Other**
+- LocalStorage (for client-side caching)
+- Chart.js (analytics & insights charts)
+
+---
+## ⭐ Features
+
+### 🔹 Core Inventory Features
+- Add, edit, delete products  
+- Category-wise product organization  
+- Automatic low-stock warnings  
+- Product search & smart filters  
+- Bulk import/export (CSV)
+
+### 🔹 Stock Tracking
+- Purchase entry  
+- Stock-in / Stock-out logs  
+- Real-time update of quantities  
+- Expiry date tracking  
+- Supplier assignment per product
+
+### 🔹 Sales Management
+- Create instant bills  
+- Apply discounts & tax  
+- Auto stock deduction on billing  
+- Daily/weekly/monthly revenue reports  
+- Saved bills & invoice history
+
+### 🔹 Analytics & Insights
+- Best-selling products  
+- Category performance  
+- Stock movement trends  
+- Profit tracking (basic)  
+- Analytics charts using Chart.js
+
+### 🔹 Screens (All Screens Included)
+- Dashboard  
+- Product List  
+- Add / Edit Product  
+- Categories  
+- Stock Logs  
+- Sales / Billing  
+- Sales History  
+- Analytics  
+- Settings  
+- Profile  
+- Login / Register  
+
+### 🔹 System Utilities
+- Dark mode  
+- LocalStorage caching for faster page loads  
+- Responsive design for mobile/tablet  
+- Backup/Restore system (MySQL)  
+- Activity log for user actions  
 
 ---
 
-## Tech Stack
 
-Frontend: HTML, CSS, JavaScript
+## 🧩 System Architecture & Database Schema
 
-Backend: PHP
+### **System Architecture**
+StockMaster follows a simple and efficient 3-layer structure:
 
-Database: MySQL
+1. **Frontend (Client Layer)**
+   - Pure HTML, CSS, JavaScript
+   - UI rendering + form validation
+   - LocalStorage caching for quick fetches
 
-Storage: LocalStorage (for non-critical cached UI data)
+2. **Backend (Server Layer)**
+   - PHP-based REST-style API endpoints
+   - Handles CRUD operations, authentication, analytics calculations
 
-Charts & Analytics: Chart.js
+3. **Database Layer**
+   - MySQL storing products, categories, users, sales, logs, stock history
 
----
-
-## Features
-
-Core Screens
-
-Login Page – Authenticate user with MySQL.
-
-Signup Page – Register new accounts.
-
-Dashboard – KPIs, quick links, charts.
-
-Products Page – List, filter, and manage products.
-
-Create Product – Add new items with SKU, price, quantity.
-
-Receipts Page – View GRNs (Goods Received Notes).
-
-Create Receipt – Add new stock arrivals.
-
-Delivery Page – View all outgoing deliveries.
-
-Create Delivery – Reduce stock for customer dispatches.
-
-Transfers Page – View inter-location movements.
-
-Create Transfer – Move stock between warehouses/branches.
-
-Adjustments Page – Track corrections (damage, errors, expiry).
-
-Create Adjustment – Manually adjust stock quantities.
-
-Move History Page – A single combined log of all stock movements.
-
-Settings Page – Preferences, theme, configurations.
-
-Profile Page – User info and profile management.
-
-
-Additional Functional Features
-
-Real-time form validation
-
-Modern UI with clean layout
-
-LocalStorage caching for faster experience
-
-Fully responsive
-
-Dashboard insights with charts
-
-Smooth navigation without heavy animations
-
-Modular JavaScript structure
-
-Search + filter tables
-
-Optimized for speed
+Data Flow:
+Frontend → API (PHP) → MySQL → API Response → Rendered on UI
 
 ---
 
-## System Architecture & Database Schema
+### **Database Schema**
 
-Architecture Flow
+#### **1. users**
+| column        | type          | details                |
+|---------------|----------------|------------------------|
+| id            | INT (PK)       | auto increment         |
+| name          | VARCHAR(100)   |                        |
+| email         | VARCHAR(150)   | unique                 |
+| password      | VARCHAR(255)   | hashed                 |
+| role          | VARCHAR(20)    | admin / staff          |
+| created_at    | TIMESTAMP      | default current        |
 
-Frontend (HTML/CSS/JS)
-        ↓  
-PHP Backend (API-style handlers)
-        ↓  
-MySQL Database  
-        ↓  
-LocalStorage (UI cache)
+#### **2. products**
+| column        | type            | details                   |
+|---------------|------------------|---------------------------|
+| id            | INT (PK)         | auto increment            |
+| name          | VARCHAR(150)     |                           |
+| category_id   | INT (FK)         | references categories     |
+| quantity      | INT              |                           |
+| price         | DECIMAL(10,2)    | selling price             |
+| cost_price    | DECIMAL(10,2)    | buying cost               |
+| expiry_date   | DATE             | nullable                  |
+| supplier      | VARCHAR(150)     | nullable                  |
+| created_at    | TIMESTAMP        |                           |
 
-Database Schema
+#### **3. categories**
+| id | name |
+|----|------|
 
-users
+#### **4. sales**
+| column        | type             | details               |
+|---------------|-------------------|-----------------------|
+| id            | INT (PK)          |                       |
+| bill_no       | VARCHAR(50)       | unique                |
+| total_amount  | DECIMAL(10,2)     |                       |
+| discount      | DECIMAL(10,2)     |                       |
+| tax           | DECIMAL(10,2)     |                       |
+| final_amount  | DECIMAL(10,2)     |                       |
+| created_at    | TIMESTAMP         |                       |
 
-id
+#### **5. sale_items**
+| sale_id | product_id | quantity | price_at_sale |
 
-name
+#### **6. stock_logs**
+| id | product_id | type (in/out) | quantity | note | created_at |
 
-email
-
-password
-
-
-products
-
-id
-
-name
-
-sku
-
-category
-
-quantity
-
-price
-
-created_at
-
-
-receipts
-
-id
-
-product_id
-
-qty_received
-
-supplier
-
-date
-
-
-deliveries
-
-id
-
-product_id
-
-qty_delivered
-
-client
-
-date
-
-
-transfers
-
-id
-
-product_id
-
-from_location
-
-to_location
-
-qty
-
-date
-
-
-adjustments
-
-id
-
-product_id
-
-qty_change
-
-reason
-
-date
-
-
-move_history
-
-id
-
-product_id
-
-type
-
-qty
-
-date
+#### **7. activity_log**
+| id | action | user_id | details | created_at |
 
 ---
 
-## How to Setup
-
-1. Clone the Repository
-
-git clone github.com
-
-2. Go to the Project Folder
-
-cd stockmaster
-
-3. Import the Database
-
-Open phpMyAdmin or MySQL CLI
-
-Create a new database named stockmaster
-
-Import stockmaster.sql
 
 
-4. Configure Database Credentials
+##  How to Set Up
+### 1 Clone the Repository
+```bash
+git clone https://github.com/your-username/your-repo.git
+cd your-repo
+```
+### 2 Import the MySQL Database
+```sql
+CREATE DATABASE stockmaster;
+USE stockmaster;
+SOURCE schema.sql;
+```
+### 3 Start Local Server
+```bash
+python3 -m http.server 8080
+```
+### 4 Configure DB Connection
+```js
+export const DB_CONFIG = {
+host: "localhost",
+user: "root",
+password: "",
+database: "stockmaster"
+};
+```
+### 5 Run the Application
+http://localhost:8080
 
-Edit config.php:
 
-DB_HOST = "localhost";
-DB_NAME = "stockmaster";
-DB_USER = "root";
-DB_PASS = "";
+## 👥 Contributors
 
-5. Run Locally
+- **Viraj Ravani**
+- **Visha Yadav**
+- **Astha Tiwari**
+- **Kavya Gada**
 
-Place the folder into:
+Made with ❤️ by Team *Hogwarts Hackedemy*.
 
-/htdocs → XAMPP  
-/www    → WAMP
-
-Then open in browser:
-
-http://localhost/stockmaster
-
----
-
-## Screenshots
-
-![Dashboard](screenshots/dashboard.png)
-![Products Page](screenshots/products.png)
-![Move History](screenshots/history.png)
-
-(Add images later)
-
----
-
-## Contributors
-
-Name	Role
-
-vv	Developer, UI/UX, System Architecture
