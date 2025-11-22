@@ -199,7 +199,7 @@ http://localhost:8080
 - **Astha Tiwari** — [GitHub](https://github.com/asthatiwari10)
 - **Kavya Gada** — [GitHub](https://github.com/thekavyagada)
 
-Made with ❤️ by Team *Hogwarts Hackedemy*.
+
 
 
 Made with ❤️ by Team *Hogwarts Hackedemy*.
