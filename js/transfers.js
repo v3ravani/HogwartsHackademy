@@ -1,10 +1,93 @@
 // StockMaster - Transfers Module
 
+let currentView = localStorage.getItem('transfersView') || 'list';
+
 function loadTransfers() {
     const transfers = getTransfers();
     const products = getProducts();
+    const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
     
-    displayTransfers(transfers, products);
+    const filteredTransfers = transfers.filter(transfer => 
+        transfer.fromLocation.toLowerCase().includes(searchTerm) ||
+        transfer.toLocation.toLowerCase().includes(searchTerm) ||
+        transfer.id.toString().includes(searchTerm) ||
+        transfer.status.toLowerCase().includes(searchTerm)
+    );
+    
+    if (currentView === 'list') {
+        displayTransfers(filteredTransfers, products);
+    } else {
+        displayTransfersKanban(filteredTransfers, products);
+    }
+}
+
+function switchView(view) {
+    currentView = view;
+    localStorage.setItem('transfersView', view);
+    
+    const listBtn = document.getElementById('listViewBtn');
+    const kanbanBtn = document.getElementById('kanbanViewBtn');
+    const listContainer = document.getElementById('transfersList');
+    const kanbanContainer = document.getElementById('transfersKanban');
+    
+    if (view === 'list') {
+        listBtn?.classList.add('active');
+        kanbanBtn?.classList.remove('active');
+        if (listContainer) listContainer.style.display = 'flex';
+        if (kanbanContainer) kanbanContainer.style.display = 'none';
+    } else {
+        listBtn?.classList.remove('active');
+        kanbanBtn?.classList.add('active');
+        if (listContainer) listContainer.style.display = 'none';
+        if (kanbanContainer) kanbanContainer.style.display = 'grid';
+    }
+    
+    loadTransfers();
+}
+
+function displayTransfersKanban(transfers, products) {
+    const container = document.getElementById('transfersKanban');
+    if (!container) return;
+    
+    if (transfers.length === 0) {
+        container.innerHTML = '<div style="text-align: center; color: #5F6368; padding: 60px 20px; background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); grid-column: 1/-1;"><p style="font-size: 14px;">No transfers found</p></div>';
+        return;
+    }
+    
+    container.innerHTML = transfers.map(transfer => {
+        const productList = transfer.products.slice(0, 2).map(item => {
+            const product = products.find(p => p.id === item.productId);
+            return `${product ? product.name : 'Unknown'} (${item.quantity})`;
+        }).join(', ');
+        const moreProducts = transfer.products.length > 2 ? ` +${transfer.products.length - 2} more` : '';
+        
+        const statusColors = {
+            'Draft': { bg: 'rgba(95, 99, 104, 0.1)', color: '#5F6368' },
+            'Waiting': { bg: 'rgba(249, 171, 0, 0.1)', color: '#F9AB00' },
+            'Ready': { bg: 'rgba(26, 115, 232, 0.1)', color: '#1A73E8' },
+            'Done': { bg: 'rgba(29, 185, 84, 0.1)', color: '#1DB954' },
+            'Canceled': { bg: 'rgba(211, 47, 47, 0.1)', color: '#D32F2F' }
+        };
+        const statusStyle = statusColors[transfer.status] || statusColors['Draft'];
+        
+        return `<div class="kanban-card">
+            <div style="margin-bottom: 12px;">
+                <h3 style="margin: 0 0 4px 0; color: #202124; font-size: 16px; font-weight: 500;">Transfer #${transfer.id}</h3>
+                <p style="margin: 0; color: #5F6368; font-size: 12px;">${transfer.fromLocation} → ${transfer.toLocation}</p>
+            </div>
+            <div style="padding: 12px; background: #F8F9FA; border-radius: 8px; margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: #5F6368; font-size: 11px; text-transform: uppercase; font-weight: 500;">Date</span>
+                    <span style="font-size: 12px; color: #202124;">${new Date(transfer.date).toLocaleDateString()}</span>
+                </div>
+                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0, 0, 0, 0.06);">
+                    <span style="color: #5F6368; font-size: 11px; text-transform: uppercase; font-weight: 500;">Products</span>
+                    <p style="margin: 4px 0 0 0; color: #202124; font-size: 12px;">${productList}${moreProducts}</p>
+                </div>
+            </div>
+            <div style="padding: 6px 10px; background: ${statusStyle.bg}; color: ${statusStyle.color}; border-radius: 6px; font-size: 11px; font-weight: 500; text-align: center; text-transform: uppercase;">${transfer.status}</div>
+        </div>`;
+    }).join('');
 }
 
 function displayTransfers(transfers, products) {

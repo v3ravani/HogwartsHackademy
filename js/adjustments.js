@@ -1,10 +1,94 @@
 // StockMaster - Adjustments Module
 
+let currentView = localStorage.getItem('adjustmentsView') || 'list';
+
 function loadAdjustments() {
     const adjustments = getAdjustments();
     const products = getProducts();
+    const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
     
-    displayAdjustments(adjustments, products);
+    const filteredAdjustments = adjustments.filter(adjustment => {
+        const product = products.find(p => p.id === adjustment.productId);
+        return (
+            (product && product.name.toLowerCase().includes(searchTerm)) ||
+            adjustment.location.toLowerCase().includes(searchTerm) ||
+            adjustment.id.toString().includes(searchTerm)
+        );
+    });
+    
+    if (currentView === 'list') {
+        displayAdjustments(filteredAdjustments, products);
+    } else {
+        displayAdjustmentsKanban(filteredAdjustments, products);
+    }
+}
+
+function switchView(view) {
+    currentView = view;
+    localStorage.setItem('adjustmentsView', view);
+    
+    const listBtn = document.getElementById('listViewBtn');
+    const kanbanBtn = document.getElementById('kanbanViewBtn');
+    const listContainer = document.getElementById('adjustmentsList');
+    const kanbanContainer = document.getElementById('adjustmentsKanban');
+    
+    if (view === 'list') {
+        listBtn?.classList.add('active');
+        kanbanBtn?.classList.remove('active');
+        if (listContainer) listContainer.style.display = 'flex';
+        if (kanbanContainer) kanbanContainer.style.display = 'none';
+    } else {
+        listBtn?.classList.remove('active');
+        kanbanBtn?.classList.add('active');
+        if (listContainer) listContainer.style.display = 'none';
+        if (kanbanContainer) kanbanContainer.style.display = 'grid';
+    }
+    
+    loadAdjustments();
+}
+
+function displayAdjustmentsKanban(adjustments, products) {
+    const container = document.getElementById('adjustmentsKanban');
+    if (!container) return;
+    
+    if (adjustments.length === 0) {
+        container.innerHTML = '<div style="text-align: center; color: #5F6368; padding: 60px 20px; background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); grid-column: 1/-1;"><p style="font-size: 14px;">No adjustments found</p></div>';
+        return;
+    }
+    
+    container.innerHTML = adjustments.map(adjustment => {
+        const product = products.find(p => p.id === adjustment.productId);
+        const systemStock = adjustment.systemStock || 0;
+        const difference = adjustment.physicalCount - systemStock;
+        
+        return `<div class="kanban-card">
+            <div style="margin-bottom: 12px;">
+                <h3 style="margin: 0 0 4px 0; color: #202124; font-size: 16px; font-weight: 500;">Adjustment #${adjustment.id}</h3>
+                <p style="margin: 0; color: #5F6368; font-size: 12px;">${product ? product.name : 'Unknown'}</p>
+            </div>
+            <div style="padding: 12px; background: #F8F9FA; border-radius: 8px; margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: #5F6368; font-size: 11px; text-transform: uppercase; font-weight: 500;">Location</span>
+                    <span style="font-size: 12px; color: #202124;">${adjustment.location}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: #5F6368; font-size: 11px; text-transform: uppercase; font-weight: 500;">System</span>
+                    <span style="font-size: 12px; color: #202124;">${systemStock}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: #5F6368; font-size: 11px; text-transform: uppercase; font-weight: 500;">Physical</span>
+                    <span style="font-size: 12px; color: #202124;">${adjustment.physicalCount}</span>
+                </div>
+                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0, 0, 0, 0.06);">
+                    <span style="color: #5F6368; font-size: 11px; text-transform: uppercase; font-weight: 500;">Difference</span>
+                    <p style="margin: 4px 0 0 0; font-size: 16px; font-weight: 500; color: ${difference >= 0 ? '#1DB954' : '#D32F2F'};">
+                        ${difference >= 0 ? '+' : ''}${difference}
+                    </p>
+                </div>
+            </div>
+            <div style="color: #5F6368; font-size: 11px; text-align: center;">${new Date(adjustment.date).toLocaleDateString()}</div>
+        </div>`;
+    }).join('');
 }
 
 function displayAdjustments(adjustments, products) {

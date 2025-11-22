@@ -1,5 +1,7 @@
 // StockMaster - Products Module
 
+let currentView = localStorage.getItem('productsView') || 'list';
+
 function loadProducts() {
     const products = getProducts();
     const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
@@ -10,7 +12,69 @@ function loadProducts() {
         product.category.toLowerCase().includes(searchTerm)
     );
     
-    displayProducts(filteredProducts);
+    if (currentView === 'list') {
+        displayProducts(filteredProducts);
+    } else {
+        displayProductsKanban(filteredProducts);
+    }
+}
+
+function switchView(view) {
+    currentView = view;
+    localStorage.setItem('productsView', view);
+    
+    const listBtn = document.getElementById('listViewBtn');
+    const kanbanBtn = document.getElementById('kanbanViewBtn');
+    const listContainer = document.getElementById('productsList');
+    const kanbanContainer = document.getElementById('productsKanban');
+    
+    if (view === 'list') {
+        listBtn?.classList.add('active');
+        kanbanBtn?.classList.remove('active');
+        if (listContainer) listContainer.style.display = 'flex';
+        if (kanbanContainer) kanbanContainer.style.display = 'none';
+    } else {
+        listBtn?.classList.remove('active');
+        kanbanBtn?.classList.add('active');
+        if (listContainer) listContainer.style.display = 'none';
+        if (kanbanContainer) kanbanContainer.style.display = 'grid';
+    }
+    
+    loadProducts();
+}
+
+function displayProductsKanban(products) {
+    const container = document.getElementById('productsKanban');
+    if (!container) return;
+    
+    if (products.length === 0) {
+        container.innerHTML = '<div style="text-align: center; color: #5F6368; padding: 60px 20px; background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); grid-column: 1/-1;"><p style="font-size: 14px;">No products found</p></div>';
+        return;
+    }
+    
+    container.innerHTML = products.map(product => `
+        <div class="kanban-card">
+            <div style="margin-bottom: 12px;">
+                <h3 style="margin: 0 0 4px 0; color: #202124; font-size: 16px; font-weight: 500;">${product.name}</h3>
+                <p style="margin: 0; color: #5F6368; font-size: 12px;">${product.sku}</p>
+            </div>
+            <div style="padding: 12px; background: #F8F9FA; border-radius: 8px; margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: #5F6368; font-size: 11px; text-transform: uppercase; font-weight: 500;">Stock</span>
+                    <span style="font-size: 20px; font-weight: 500; color: ${product.stock < 10 ? '#D32F2F' : '#1DB954'};">${product.stock}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: #5F6368; font-size: 11px; text-transform: uppercase; font-weight: 500;">Category</span>
+                    <span style="font-size: 12px; color: #202124;">${product.category}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: #5F6368; font-size: 11px; text-transform: uppercase; font-weight: 500;">Location</span>
+                    <span style="font-size: 12px; color: #202124;">${product.location}</span>
+                </div>
+            </div>
+            ${product.stock < 10 ? '<div style="padding: 6px 10px; background: rgba(211, 47, 47, 0.1); color: #D32F2F; border-radius: 6px; font-size: 11px; font-weight: 500; text-align: center;">Low Stock</div>' : '<div style="padding: 6px 10px; background: rgba(29, 185, 84, 0.1); color: #1DB954; border-radius: 6px; font-size: 11px; font-weight: 500; text-align: center;">In Stock</div>'}
+        </div>
+    `).join('');
 }
 
 function displayProducts(products) {

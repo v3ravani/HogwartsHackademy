@@ -3,8 +3,28 @@
 function loadHistory() {
     const history = getHistory();
     const products = getProducts();
+    const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
     
-    displayHistory(history, products);
+    const filteredHistory = history.filter(entry => {
+        const productNames = Array.isArray(entry.productId) 
+            ? entry.productId.map(id => {
+                const product = products.find(p => p.id === id);
+                return product ? product.name.toLowerCase() : '';
+            }).join(' ')
+            : (() => {
+                const product = products.find(p => p.id === entry.productId);
+                return product ? product.name.toLowerCase() : '';
+            })();
+        
+        return (
+            entry.type.toLowerCase().includes(searchTerm) ||
+            entry.location.toLowerCase().includes(searchTerm) ||
+            productNames.includes(searchTerm) ||
+            entry.quantity.toString().includes(searchTerm)
+        );
+    });
+    
+    displayHistory(filteredHistory, products);
 }
 
 function displayHistory(history, products) {
