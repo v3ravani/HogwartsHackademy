@@ -1,176 +1,265 @@
-# 🏭 StockMaster – Smart Inventory Management System  
-### Built by **Hogwarts Hackedemy** for Hackathon 2025
+# 📦 StockMaster — Inventory Management System
 
-StockMaster is a modern, multi-screen, web-based Inventory Management System designed to simplify product control, warehouse operations, and real-time stock visibility.  
-It features a clean UI, streamlined workflows, modular pages, and **Firebase-powered Login Authentication**, built for speed, clarity, and hackathon performance.
-
----
-
-## 🚀 Live Demo
-👉 *Add your deployed link here*
+StockMaster is a modern, lightweight, and efficient Inventory Management System designed to help small and medium businesses manage stock operations smoothly.
+It includes product management, receipts, deliveries, transfers, adjustments, analytics, and a complete movement history — all presented through a clean, intuitive UI.
 
 ---
 
-## ✨ About the Project
+## 📑 Index
 
-Developed during a 48-hour hackathon, **StockMaster** was created with a mission to build a lightweight yet powerful inventory system suitable for warehouses, businesses, and logistics teams.
-
-It includes **16 interconnected modules**, reusable JavaScript logic, dynamic UI rendering, and a flexible data system for products, stock movements, and transactions.
-
----
-
-## 🧠 Key Features
-
-### 🔐 Authentication (Firebase)
-- Login using Firebase Authentication (Email/Password)
-- Secure session handling
-- Logout & local session removal
+1. Introduction
+2. Tech Stack
+3. Features
+4. System Architecture & Database Schema
+5. How to Setup
+6. Screenshots
+7. Contributors
 
 ---
 
-### 📊 Dashboard
-- KPI Cards:
-  - Total Products
-  - Low Stock Items
-  - Pending Receipts
-  - Pending Deliveries
-  - Scheduled Transfers
-- Filters by:
-  - Document Type (Receipts / Delivery / Internal / Adjustments)
-  - Status (Draft, Waiting, Ready, Done)
-  - Warehouse (WH1 / WH2)
-  - Category
+## Introduction
+
+StockMaster is built for businesses that need an easy-to-use inventory tool without complex enterprise overhead.
+With fast UI, modular structure, and MySQL backend, StockMaster helps track stock efficiently across products, warehouses, deliveries, receipts, and adjustments.
 
 ---
 
-### 📦 Product Management
-- Product listing with search
-- Add new products
-- Stock auto-updated through receipts, deliveries & adjustments
-- Clean modal-style forms for creation
+## Tech Stack
+
+Frontend: HTML, CSS, JavaScript
+
+Backend: PHP
+
+Database: MySQL
+
+Storage: LocalStorage (for non-critical cached UI data)
+
+Charts & Analytics: Chart.js
 
 ---
 
-### 📥 Receipt Management (Incoming Stock)
-- Create new receipt orders
-- Supplier selection
-- Add products & quantities
-- Auto-increase stock levels
+## Features
+
+Core Screens
+
+Login Page – Authenticate user with MySQL.
+
+Signup Page – Register new accounts.
+
+Dashboard – KPIs, quick links, charts.
+
+Products Page – List, filter, and manage products.
+
+Create Product – Add new items with SKU, price, quantity.
+
+Receipts Page – View GRNs (Goods Received Notes).
+
+Create Receipt – Add new stock arrivals.
+
+Delivery Page – View all outgoing deliveries.
+
+Create Delivery – Reduce stock for customer dispatches.
+
+Transfers Page – View inter-location movements.
+
+Create Transfer – Move stock between warehouses/branches.
+
+Adjustments Page – Track corrections (damage, errors, expiry).
+
+Create Adjustment – Manually adjust stock quantities.
+
+Move History Page – A single combined log of all stock movements.
+
+Settings Page – Preferences, theme, configurations.
+
+Profile Page – User info and profile management.
+
+
+Additional Functional Features
+
+Real-time form validation
+
+Modern UI with clean layout
+
+LocalStorage caching for faster experience
+
+Fully responsive
+
+Dashboard insights with charts
+
+Smooth navigation without heavy animations
+
+Modular JavaScript structure
+
+Search + filter tables
+
+Optimized for speed
 
 ---
 
-### 📤 Delivery Orders
-- Customer delivery module
-- Select product, validate stock availability
-- Decrease stock automatically
+## System Architecture & Database Schema
+
+Architecture Flow
+
+Frontend (HTML/CSS/JS)
+        ↓  
+PHP Backend (API-style handlers)
+        ↓  
+MySQL Database  
+        ↓  
+LocalStorage (UI cache)
+
+Database Schema
+
+users
+
+id
+
+name
+
+email
+
+password
+
+
+products
+
+id
+
+name
+
+sku
+
+category
+
+quantity
+
+price
+
+created_at
+
+
+receipts
+
+id
+
+product_id
+
+qty_received
+
+supplier
+
+date
+
+
+deliveries
+
+id
+
+product_id
+
+qty_delivered
+
+client
+
+date
+
+
+transfers
+
+id
+
+product_id
+
+from_location
+
+to_location
+
+qty
+
+date
+
+
+adjustments
+
+id
+
+product_id
+
+qty_change
+
+reason
+
+date
+
+
+move_history
+
+id
+
+product_id
+
+type
+
+qty
+
+date
 
 ---
 
-### 🔁 Internal Transfers
-- Transfer products between locations
-- Stock updated per warehouse
-- Transfer logs stored for history
+## How to Setup
 
----
+1. Clone the Repository
 
-### 🧮 Stock Adjustments
-- Physical count vs system quantity
-- Auto-difference calculation
-- Adjustment history logging
+git clone github.com
 
----
+2. Go to the Project Folder
 
-### 🕒 Move History
-Unified timeline for:
-- Receipts  
-- Deliveries  
-- Transfers  
-- Adjustments  
-
-Each entry includes timestamp, action type, product, quantity, and locations.
-
----
-
-### ⚙️ Settings
-- Manage warehouses (add/remove)
-- Manage categories
-- Local data persistence
-
----
-
-### 👤 User Profile
-- Display User ID & Name
-- Change Password (mock)
-- Logout button
-
----
-
-## 📂 Project Structure
-- login.html
-- signup.html
-- dashboard.html
-- products.html
-- create_product.html
-- receipts.html
-- create_receipt.html
-- delivery.html
-- create_delivery.html
-- transfers.html
-- create_transfer.html
-- adjustments.html
-- create_adjustment.html
-- move_history.html
-- settings.html
-- profile.html
-- /js/
-- data.js
-- login.js
-- navigation.js
-- products.js
-- receipts.js
-- delivery.js
-- transfers.js
-- adjustments.js
-- history.js
-
-
-
-
----
-
-## 🔧 Tech Stack
-
-- **Frontend:** HTML, JavaScript (modular structure, dynamic rendering)
-- **Authentication:** Firebase Authentication
-- **Hosting:** GitHub Pages / Firebase Hosting  
-- **Design System:**  
-  - Card-based layout  
-  - Modern dashboard UI  
-  - Inline styling  
-  - Responsive design  
-
----
-
-## 🛠️ How to Run Locally
-
-### 1. Clone the Repository
-```bash
-git clone https://github.com/your-repo/stockmaster.git
 cd stockmaster
 
+3. Import the Database
 
-const firebaseConfig = {
-   apiKey: "YOUR_API_KEY",
-   authDomain: "YOUR_AUTH_DOMAIN",
-   projectId: "YOUR_PROJECT_ID",
-   storageBucket: "YOUR_STORAGE_BUCKET",
-   messagingSenderId: "YOUR_SENDER_ID",
-   appId: "YOUR_APP_ID"
-};
+Open phpMyAdmin or MySQL CLI
+
+Create a new database named stockmaster
+
+Import stockmaster.sql
 
 
-⭐ Support
+4. Configure Database Credentials
 
-If you found this project useful, consider giving a ⭐ star to the repository!
-Contributions & suggestions are welcome.
+Edit config.php:
 
+DB_HOST = "localhost";
+DB_NAME = "stockmaster";
+DB_USER = "root";
+DB_PASS = "";
+
+5. Run Locally
+
+Place the folder into:
+
+/htdocs → XAMPP  
+/www    → WAMP
+
+Then open in browser:
+
+http://localhost/stockmaster
+
+---
+
+## Screenshots
+
+![Dashboard](screenshots/dashboard.png)
+![Products Page](screenshots/products.png)
+![Move History](screenshots/history.png)
+
+(Add images later)
+
+---
+
+## Contributors
+
+Name	Role
+
+vv	Developer, UI/UX, System Architecture
