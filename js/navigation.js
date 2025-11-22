@@ -3,7 +3,7 @@
 function createSidebar(activePage) {
     const sidebar = document.getElementById('sidebar');
     if (!sidebar) return;
-    
+
     const menuItems = [
         { icon: 'dashboard', text: 'Dashboard', page: 'dashboard.html' },
         { icon: 'inventory', text: 'Products', page: 'products.html' },
@@ -19,7 +19,7 @@ function createSidebar(activePage) {
         { icon: 'profile', text: 'Profile', page: 'profile.html' },
         { icon: 'logout', text: 'Logout', action: 'logout' }
     ];
-    
+
     const getIcon = (iconName) => {
         const icons = {
             dashboard: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>',
@@ -38,7 +38,7 @@ function createSidebar(activePage) {
         };
         return icons[iconName] || '';
     };
-    
+
     sidebar.innerHTML = `
         <div style="padding: 24px 20px; border-bottom: 1px solid rgba(0,0,0,0.06);">
             <h2 style="margin: 0; color: #1A73E8; font-size: 22px; font-weight: 600; letter-spacing: -0.3px;">StockMaster</h2>
@@ -99,6 +99,8 @@ function createSidebar(activePage) {
             }
         </style>
     `;
+
+    // no JS interactions required for the simple sidebar
 }
 
 // Make logout function globally available
@@ -109,4 +111,23 @@ window.logout = function() {
         window.location.href = 'login.html';
     }
 };
+
+// Auto-initialize sidebar on pages that include a #sidebar element but
+// don't explicitly call createSidebar or where the inline call may have been
+// skipped (e.g., due to script load order). This is a safe fallback.
+document.addEventListener('DOMContentLoaded', function () {
+    try {
+        const sb = document.getElementById('sidebar');
+        if (sb && sb.innerHTML.trim() === '') {
+            const page = window.location.pathname.split('/').pop() || 'dashboard.html';
+            // Call createSidebar if available
+            if (typeof createSidebar === 'function') {
+                createSidebar(page);
+            }
+        }
+    } catch (err) {
+        // don't break page if something unexpected happens
+        console.error('Sidebar auto-init error:', err);
+    }
+});
 

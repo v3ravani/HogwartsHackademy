@@ -432,6 +432,27 @@
     </style>
 </head>
 <body>
+    <script>
+        // Client-side session guard for pages served as static HTML.
+        // Calls server/session.php and redirects to login if not authenticated.
+        (async function(){
+            try {
+                const res = await fetch('server/session.php', { credentials: 'same-origin' });
+                const json = await res.json();
+                if (!json.authenticated) {
+                    // keep legacy localStorage fallback for compatibility
+                    if (!localStorage.getItem('stockmaster_authenticated')) {
+                        window.location.href = 'login.html';
+                    }
+                }
+            } catch (e) {
+                // If session check fails (network), fall back to client-side flag
+                if (!localStorage.getItem('stockmaster_authenticated')) {
+                    window.location.href = 'login.html';
+                }
+            }
+        })();
+    </script>
     <script src="js/theme.js"></script>
     <div class="container">
         <div id="sidebar"></div>
@@ -537,6 +558,26 @@
                     <div class="chart-container" id="trendChart"></div>
                 </div>
             </div>
+
+            <!-- Additional charts restored -->
+            <div class="charts-section" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Inventory Value by Category</h3>
+                        <span class="chart-subtitle">Estimated monetary value per category</span>
+                    </div>
+                    <div class="chart-container" id="valueCategoryChart"></div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Activity (last 6 months)</h3>
+                        <span class="chart-subtitle">Receipts & Deliveries per month</span>
+                    </div>
+                    <div class="chart-container" id="salesMonthChart"></div>
+                </div>
+            </div>
+            <!-- Diagnostic summary (dev) -->
+            <div id="chartDiagnostics" style="margin-bottom:20px;padding:12px;border-radius:8px;background:rgba(0,0,0,0.03);color:var(--muted);">Chart diagnostics will appear here.</div>
             
             <div class="widgets-grid expanded">
                 <div class="widget-card">
@@ -874,23 +915,37 @@
         
         function loadStockAlerts() {
             const { products } = getFilteredData();
-            const lowStock = products.filter(p => p.stock < 10).slice(0, 5);
+            const rules = getReorderRules();
+            // Determine low stock based on rules or default threshold
+            const lowStockItems = products.filter(p => {
+                const rule = rules[p.id];
+                if (rule && typeof rule.min === 'number') {
+                    return p.stock < rule.min;
+                }
+                return p.stock < 10;
+            }).slice(0, 10);
+
             const container = document.getElementById('stockAlerts');
             const countEl = document.getElementById('alertCount');
-            
-            countEl.textContent = lowStock.length;
-            
-            if (lowStock.length === 0) {
-                container.innerHTML = '<p style="color: #1DB954; font-size: 14px; padding: 12px; background: rgba(29, 185, 84, 0.1); border-radius: 8px; text-align: center;">All products are well stocked</p>';
+
+            countEl.textContent = lowStockItems.length;
+
+            if (lowStockItems.length === 0) {
+                container.innerHTML = '<p style="color: #1DB954; font-size: 14px; padding: 12px; background: rgba(29, 185, 84, 0.1); border-radius: 8px; text-align: center;'>All products are well stocked</p>';
                 return;
             }
-            
-            container.innerHTML = lowStock.map(product => `
+
+            container.innerHTML = lowStockItems.map(product => {
+                const rule = rules[product.id] || null;
+                const suggested = rule && rule.qty ? `Suggested reorder: ${rule.qty}` : '';
+                const vendor = rule && rule.vendor ? `Preferred vendor: ${rule.vendor}` : '';
+                return `
                 <div style="padding: 12px; background: rgba(211, 47, 47, 0.05); border-left: 3px solid #D32F2F; border-radius: 6px; margin-bottom: 8px;">
                     <p style="margin: 0 0 4px 0; font-size: 14px; color: #202124; font-weight: 500;">${product.name}</p>
-                    <p style="margin: 0; font-size: 12px; color: #5F6368;">Only ${product.stock} ${product.unit} remaining</p>
+                    <p style="margin: 0; font-size: 12px; color: #5F6368;">Only ${product.stock} ${product.unit} remaining ${suggested ? ' • ' + suggested : ''} ${vendor ? ' • ' + vendor : ''}</p>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         }
         
         updateClock();
@@ -908,12 +963,20 @@
                 return { label: cat, value: stock };
             }).filter(d => d.value > 0);
             
-            if (categoryData.length > 0) {
-                createBarChart('categoryChart', categoryData, {
-                    width: 500,
-                    height: 250,
-                    colors: ['#1A73E8', '#1DB954', '#F9AB00', '#D32F2F', '#9C27B0']
-                });
+            console.log('dashboard: categoryData=', categoryData);
+            try {
+                if (categoryData.length > 0) {
+                    createBarChart('categoryChart', categoryData, {
+                        width: 500,
+                        height: 250,
+                        colors: ['#1A73E8', '#1DB954', '#F9AB00', '#D32F2F', '#9C27B0']
+                    });
+                } else {
+                    document.getElementById('categoryChart').innerHTML = '<p style="color:#5F6368">No category stock data</p>';
+                }
+            } catch (e) {
+                console.error('Error rendering categoryChart', e);
+                document.getElementById('categoryChart').innerHTML = '<p style="color:#D32F2F">Chart error — see console</p>';
             }
             
             // Trend Chart (simulated last 7 days)
@@ -937,74 +1000,112 @@
                 deliveryData.push(dayDeliveries > 0 ? dayDeliveries : Math.floor(Math.random() * 4) + 1);
             }
             
-            // Create combined trend chart using line chart for receipts
-            const receiptChartData = labels.map((label, index) => ({ label, value: receiptData[index] }));
-            const deliveryChartData = labels.map((label, index) => ({ label, value: deliveryData[index] }));
-            
-            // Create multi-line chart manually
-            const container = document.getElementById('trendChart');
-            const width = 500, height = 250;
-            const maxValue = Math.max(...receiptData, ...deliveryData, 1);
-            const stepX = width / (labels.length - 1 || 1);
-            const chartHeight = height * 0.8;
-            const padding = height * 0.1;
-            
-            let svg = `<svg width="${width}" height="${height}" style="overflow: visible;">`;
-            
-            // Draw grid
-            for (let i = 0; i <= 5; i++) {
-                const y = height - (chartHeight * (i / 5)) - padding;
-                svg += `<line x1="0" y1="${y}" x2="${width}" y2="${y}" stroke="#E8EAED" stroke-width="1" opacity="0.5"/>`;
+            // Create combined trend chart using line chart for receipts/deliveries
+            try {
+                const receiptChartData = labels.map((label, index) => ({ label, value: receiptData[index] }));
+                const deliveryChartData = labels.map((label, index) => ({ label, value: deliveryData[index] }));
+                console.log('dashboard: trend labels=', labels, 'receipts=', receiptData, 'deliveries=', deliveryData);
+
+                // If there is no activity, show placeholder
+                if (receiptData.every(v => v === 0) && deliveryData.every(v => v === 0)) {
+                    document.getElementById('trendChart').innerHTML = '<p style="color:#5F6368">No recent activity</p>';
+                } else {
+                    // Reuse createTrendChart for multi-line datasets if available
+                    if (typeof createTrendChart === 'function') {
+                        createTrendChart('trendChart', labels, [
+                            { data: receiptData, color: '#1DB954' },
+                            { data: deliveryData, color: '#D32F2F' }
+                        ], { width: 500, height: 250 });
+                    } else {
+                        // Fallback: draw simple SVG (previous approach)
+                        const container = document.getElementById('trendChart');
+                        const width = 500, height = 250;
+                        const maxValue = Math.max(...receiptData, ...deliveryData, 1);
+                        const stepX = width / (labels.length - 1 || 1);
+                        const chartHeight = height * 0.8;
+                        const padding = height * 0.1;
+                        let svg = `<svg width="${width}" height="${height}" style="overflow: visible;">`;
+                        for (let i = 0; i <= 5; i++) {
+                            const y = height - (chartHeight * (i / 5)) - padding;
+                            svg += `<line x1="0" y1="${y}" x2="${width}" y2="${y}" stroke="#E8EAED" stroke-width="1" opacity="0.5"/>`;
+                        }
+                        const receiptPoints = receiptData.map((value, index) => {
+                            const x = index * stepX;
+                            const y = height - (value / maxValue) * chartHeight - padding;
+                            return `${x},${y}`;
+                        }).join(' ');
+                        svg += `<polyline points="${receiptPoints}" fill="none" stroke="#1DB954" stroke-width="2" opacity="0.8"/>`;
+                        const deliveryPoints = deliveryData.map((value, index) => {
+                            const x = index * stepX;
+                            const y = height - (value / maxValue) * chartHeight - padding;
+                            return `${x},${y}`;
+                        }).join(' ');
+                        svg += `<polyline points="${deliveryPoints}" fill="none" stroke="#D32F2F" stroke-width="2" opacity="0.8"/>`;
+                        receiptData.forEach((value, index) => {
+                            const x = index * stepX;
+                            const y = height - (value / maxValue) * chartHeight - padding;
+                            svg += `<circle cx="${x}" cy="${y}" r="3" fill="#1DB954"/>`;
+                        });
+                        deliveryData.forEach((value, index) => {
+                            const x = index * stepX;
+                            const y = height - (value / maxValue) * chartHeight - padding;
+                            svg += `<circle cx="${x}" cy="${y}" r="3" fill="#D32F2F"/>`;
+                        });
+                        labels.forEach((label, index) => {
+                            const x = index * stepX;
+                            svg += `<text x="${x}" y="${height - 5}" text-anchor="middle" font-size="9" fill="#5F6368">${label}</text>`;
+                        });
+                        svg += '</svg>';
+                        container.innerHTML = svg;
+                    }
+                }
+            } catch (e) {
+                console.error('Error rendering trendChart', e);
+                document.getElementById('trendChart').innerHTML = '<p style="color:#D32F2F">Chart error — see console</p>';
             }
             
-            // Draw receipt line
-            const receiptPoints = receiptData.map((value, index) => {
-                const x = index * stepX;
-                const y = height - (value / maxValue) * chartHeight - padding;
-                return `${x},${y}`;
-            }).join(' ');
-            svg += `<polyline points="${receiptPoints}" fill="none" stroke="#1DB954" stroke-width="2" opacity="0.8"/>`;
-            
-            // Draw delivery line
-            const deliveryPoints = deliveryData.map((value, index) => {
-                const x = index * stepX;
-                const y = height - (value / maxValue) * chartHeight - padding;
-                return `${x},${y}`;
-            }).join(' ');
-            svg += `<polyline points="${deliveryPoints}" fill="none" stroke="#D32F2F" stroke-width="2" opacity="0.8"/>`;
-            
-            // Draw points
-            receiptData.forEach((value, index) => {
-                const x = index * stepX;
-                const y = height - (value / maxValue) * chartHeight - padding;
-                svg += `<circle cx="${x}" cy="${y}" r="3" fill="#1DB954"/>`;
-            });
-            
-            deliveryData.forEach((value, index) => {
-                const x = index * stepX;
-                const y = height - (value / maxValue) * chartHeight - padding;
-                svg += `<circle cx="${x}" cy="${y}" r="3" fill="#D32F2F"/>`;
-            });
-            
-            // Draw labels
-            labels.forEach((label, index) => {
-                const x = index * stepX;
-                svg += `<text x="${x}" y="${height - 5}" text-anchor="middle" font-size="9" fill="#5F6368">${label}</text>`;
-            });
-            
-            // Add legend
-            svg += `<g transform="translate(${width - 100}, 10)">
-                <rect x="0" y="0" width="90" height="40" fill="white" stroke="#E8EAED" stroke-width="1" rx="4" opacity="0.9"/>
-                <line x1="5" y1="12" x2="20" y2="12" stroke="#1DB954" stroke-width="2"/>
-                <text x="25" y="15" font-size="10" fill="#202124">Receipts</text>
-                <line x1="5" y1="28" x2="20" y2="28" stroke="#D32F2F" stroke-width="2"/>
-                <text x="25" y="31" font-size="10" fill="#202124">Deliveries</text>
-            </g>`;
-            
-            svg += '</svg>';
-            container.innerHTML = svg;
-            
             // Warehouse Pie Chart
+            // Inventory value by category (pie)
+            const valueByCategory = categories.map(cat => {
+                const value = products.filter(p => p.category === cat).reduce((sum, p) => sum + (p.stock * (p.price || 0)), 0);
+                return { label: cat, value: Math.round(value) };
+            }).filter(d => d.value > 0);
+
+            if (valueByCategory.length > 0) {
+                createPieChart('valueCategoryChart', valueByCategory, {
+                    width: 220,
+                    height: 220,
+                    colors: ['#1A73E8', '#1DB954', '#F9AB00', '#D32F2F', '#9C27B0']
+                });
+            }
+
+            // Activity by month (last 6 months) - aggregate receipts and deliveries
+            (function(){
+                const historyData = getHistory();
+                const now = new Date();
+                const months = [];
+                for (let i = 5; i >= 0; i--) {
+                    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                    months.push({ label: d.toLocaleString('en-US', { month: 'short', year: 'numeric' }), key: d.getMonth() + '-' + d.getFullYear() });
+                }
+                const receiptsCount = months.map(m => 0);
+                const deliveriesCount = months.map(m => 0);
+                historyData.forEach(h => {
+                    const dt = new Date(h.timestamp);
+                    const key = dt.getMonth() + '-' + dt.getFullYear();
+                    const idx = months.findIndex(m => m.key === key);
+                    if (idx >= 0) {
+                        if (h.type === 'Receipt') receiptsCount[idx]++;
+                        if (h.type === 'Delivery') deliveriesCount[idx]++;
+                    }
+                });
+
+                const barData = months.map((m, i) => ({ label: m.label, value: receiptsCount[i] + deliveriesCount[i] }));
+                if (barData.some(d => d.value > 0)) {
+                    createBarChart('salesMonthChart', barData, { width: 420, height: 220, colors: ['#1A73E8', '#1DB954'] });
+                }
+            })();
+
             const warehouseData = warehouses.map(wh => {
                 const stock = products.filter(p => p.location === wh).reduce((sum, p) => sum + p.stock, 0);
                 return { label: wh, value: stock };
@@ -1017,6 +1118,14 @@
                     colors: ['#1A73E8', '#1DB954', '#F9AB00', '#D32F2F']
                 });
             }
+
+            // Diagnostic summary (visible on page) to help debug missing charts
+            try {
+                const diag = document.getElementById('chartDiagnostics');
+                if (diag) {
+                    diag.innerHTML = `Products: ${products.length} • Categories: ${categories.length} • Warehouses: ${warehouses.length} • History: ${history.length}`;
+                }
+            } catch (e) { console.warn('Failed to set chart diagnostics', e); }
         }
         
         function loadTopProducts() {

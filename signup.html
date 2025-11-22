@@ -335,6 +335,7 @@
     </div>
 
     <script src="js/theme.js"></script>
+    <script src="js/auth_local.js"></script>
     <script>
         const passwordInput = document.getElementById('password');
         const passwordStrength = document.getElementById('passwordStrength');
@@ -364,47 +365,93 @@
             }
         });
         
-        document.getElementById('signupForm').addEventListener('submit', function(e) {
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             const errorMessage = document.getElementById('errorMessage');
             const btn = document.querySelector('.btn-primary');
-            const name = document.getElementById('fullName').value;
-            const userId = document.getElementById('userId').value;
-            const email = document.getElementById('email').value;
-            
+            const name = document.getElementById('fullName').value.trim();
+            const userId = document.getElementById('userId').value.trim();
+            const email = document.getElementById('email').value.trim();
+
             if (password !== confirmPassword) {
                 errorMessage.textContent = 'Passwords do not match. Please try again.';
                 errorMessage.classList.add('show');
                 setTimeout(() => { errorMessage.classList.remove('show'); }, 4000);
                 return;
             }
-            
+
             if (password.length < 6) {
                 errorMessage.textContent = 'Password must be at least 6 characters long.';
                 errorMessage.classList.add('show');
                 setTimeout(() => { errorMessage.classList.remove('show'); }, 4000);
                 return;
             }
-            
+
             btn.style.opacity = '0.7';
             btn.style.pointerEvents = 'none';
             btn.innerHTML = '<span>Creating Account...</span>';
-            
+
             try {
-                const raw = localStorage.getItem('stockmaster_users');
-                const users = raw ? JSON.parse(raw) : [];
-                if (users.find(u => u && u.user_id === userId)) {
-                    throw new Error('User ID already exists');
+                const res = await fetch('server/signup.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, user_id: userId, email, password })
+                });
+
+                // Parse JSON safely and handle non-JSON server responses
+                const ct = res.headers.get('content-type') || '';
+                let json;
+                if (ct.includes('application/json')) {
+                    try {
+                        json = await res.json();
+                    } catch (e) {
+                        // Try local registration fallback
+                        console.warn('Malformed JSON from server, attempting local register fallback');
+                        const fallback = await authLocal.localRegister({ user_id: userId, password, name, email });
+                        if (fallback.success) {
+                            btn.innerHTML = '<span>✓ Account Created (local)</span>';
+                            btn.style.background = 'linear-gradient(135deg, #1DB954 0%, #1AA34A 100%)';
+                            setTimeout(() => { window.location.href = 'login.html'; }, 700);
+                            return;
+                        }
+                        errorMessage.textContent = 'Server returned malformed JSON.';
+                        errorMessage.classList.add('show');
+                        console.error('Malformed JSON from signup.php:', await res.text());
+                        btn.style.opacity = '1';
+                        btn.style.pointerEvents = 'auto';
+                        btn.innerHTML = '<span>Create Account</span>';
+                        return;
+                    }
+                } else {
+                    const text = await res.text();
+                    console.warn('Server did not return JSON, attempting local register fallback');
+                    const fallback = await authLocal.localRegister({ user_id: userId, password, name, email });
+                    if (fallback.success) {
+                        btn.innerHTML = '<span>✓ Account Created (local)</span>';
+                        btn.style.background = 'linear-gradient(135deg, #1DB954 0%, #1AA34A 100%)';
+                        setTimeout(() => { window.location.href = 'login.html'; }, 700);
+                        return;
+                    }
+                    errorMessage.textContent = 'Server did not return JSON. See console for details.';
+                    errorMessage.classList.add('show');
+                    console.error('Expected JSON from signup.php but got:', text);
+                    btn.style.opacity = '1';
+                    btn.style.pointerEvents = 'auto';
+                    btn.innerHTML = '<span>Create Account</span>';
+                    return;
                 }
-                users.push({ user_id: userId, password, name, email });
-                localStorage.setItem('stockmaster_users', JSON.stringify(users));
-                btn.innerHTML = '<span>✓ Account Created!</span>';
-                btn.style.background = 'linear-gradient(135deg, #1DB954 0%, #1AA34A 100%)';
-                setTimeout(() => { window.location.href = 'login.html'; }, 700);
+
+                if (json.success) {
+                    btn.innerHTML = '<span>✓ Account Created!</span>';
+                    btn.style.background = 'linear-gradient(135deg, #1DB954 0%, #1AA34A 100%)';
+                    setTimeout(() => { window.location.href = 'login.html'; }, 700);
+                    return;
+                }
+                throw new Error(json.message || 'Could not create account');
             } catch (err) {
-                errorMessage.textContent = err.message === 'User ID already exists' ? 'User ID already exists. Choose another.' : 'Could not create account. Please try again.';
+                errorMessage.textContent = err.message;
                 errorMessage.classList.add('show');
                 btn.style.opacity = '1';
                 btn.style.pointerEvents = 'auto';

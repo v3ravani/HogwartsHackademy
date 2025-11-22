@@ -258,11 +258,16 @@
                 <div style="display:flex; gap:8px; align-items:center;">
                     <button class="btn-secondary" onclick="exportProductsCSV()" title="Export as CSV">⭳ Export CSV</button>
                     <a href="create_product.html" class="btn-primary">+ Add Product</a>
+                    <!-- Dev-only: seed demo data button (visible on localhost/file) -->
+                    <button id="seed-demo-btn" class="btn-secondary" style="display:none;margin-left:8px;">Seed Demo Data</button>
                 </div>
             </div>
             
             <div class="search-bar">
                 <input type="text" id="searchInput" placeholder="Search products by name, SKU, or category..." onkeyup="loadProducts()">
+                <select id="categoryFilter" onchange="loadProducts()" style="width:180px;border:1px solid #DADCE0;border-radius:8px;padding:10px;background:#FAFAFA;color:#202124;">
+                    <option value="">All Categories</option>
+                </select>
                 <div class="view-toggle">
                     <button id="listViewBtn" class="view-btn active" onclick="switchView('list')" title="List View">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -320,6 +325,91 @@
             
             <div id="productsList" class="list-view"></div>
             <div id="productsKanban" class="kanban-view" style="display: none;"></div>
+
+            
+            <!-- Management panels placed under search -->
+            <div class="management-top" style="display:flex;flex-direction:column;gap:20px;margin-bottom:20px;">
+                <section id="update-product">
+                    <h2 style="font-size:20px; margin-bottom:12px;">Update Product</h2>
+                    <div style="background:white;padding:20px;border-radius:12px;border:1px solid rgba(0,0,0,0.04);">
+                        <p style="color:#5F6368; font-size:13px; margin-bottom:8px;">Select a product to edit its details.</p>
+                        <form id="updateProductForm">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                                <div>
+                                    <label style="font-size:13px;color:#5F6368;">Product</label>
+                                    <select id="updateProductSelect" style="width:100%;padding:10px;border:1px solid #DADCE0;border-radius:8px;"> </select>
+                                </div>
+                                <div>
+                                    <label style="font-size:13px;color:#5F6368;">Category</label>
+                                    <select id="updateProductCategory" style="width:100%;padding:10px;border:1px solid #DADCE0;border-radius:8px;"></select>
+                                </div>
+                                <div>
+                                    <label style="font-size:13px;color:#5F6368;">Unit</label>
+                                    <input id="updateProductUnit" style="width:100%;padding:10px;border:1px solid #DADCE0;border-radius:8px;" />
+                                </div>
+                                <div>
+                                    <label style="font-size:13px;color:#5F6368;">Location</label>
+                                    <select id="updateProductLocation" style="width:100%;padding:10px;border:1px solid #DADCE0;border-radius:8px;"> </select>
+                                </div>
+                                <div>
+                                    <label style="font-size:13px;color:#5F6368;">Price</label>
+                                    <input id="updateProductPrice" type="number" step="0.01" style="width:100%;padding:10px;border:1px solid #DADCE0;border-radius:8px;" />
+                                </div>
+                                <div>
+                                    <label style="font-size:13px;color:#5F6368;">Stock</label>
+                                    <input id="updateProductStock" type="number" style="width:100%;padding:10px;border:1px solid #DADCE0;border-radius:8px;" />
+                                </div>
+                            </div>
+                            <div style="margin-top:12px; display:flex; gap:8px;">
+                                <button class="btn-primary" id="saveProductBtn">Save Changes</button>
+                                <button type="button" id="resetProductBtn" style="background:#F1F3F4;color:#202124;border:none;padding:10px 16px;border-radius:8px;">Reset</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <section id="stock-availability">
+                    <h2 style="font-size:20px; margin-bottom:12px;">Stock Availability (per location)</h2>
+                    <div id="stockAvailabilityContainer" style="background:white;padding:20px;border-radius:12px;border:1px solid rgba(0,0,0,0.04);"> </div>
+                </section>
+
+                <section id="categories">
+                    <h2 style="font-size:20px; margin-bottom:12px;">Product Categories</h2>
+                    <div style="background:white;padding:20px;border-radius:12px;border:1px solid rgba(0,0,0,0.04);">
+                        <div style="display:flex;gap:12px;margin-bottom:12px;">
+                            <input id="newCategoryInput" placeholder="Add new category" style="flex:1;padding:10px;border:1px solid #DADCE0;border-radius:8px;" />
+                            <button id="addCategoryBtn" class="btn-primary">Add Category</button>
+                        </div>
+                        <div id="categoriesList"></div>
+                    </div>
+                </section>
+
+                <section id="reorder-rules" style="margin-bottom:0;">
+                    <h2 style="font-size:20px; margin-bottom:12px;">Reordering Rules</h2>
+                    <div style="background:white;padding:20px;border-radius:12px;border:1px solid rgba(0,0,0,0.04);">
+                        <p style="color:#5F6368; font-size:13px; margin-bottom:8px;">Set minimum stock levels and preferred reorder quantities for products.</p>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:12px;">
+                                <select id="reorderProductSelect" style="padding:10px;border:1px solid #DADCE0;border-radius:8px;"></select>
+                                <input id="reorderMinInput" type="number" placeholder="Min stock threshold" style="padding:10px;border:1px solid #DADCE0;border-radius:8px;" />
+                                <input id="reorderQtyInput" type="number" placeholder="Reorder quantity" style="padding:10px;border:1px solid #DADCE0;border-radius:8px;" />
+                                <input id="reorderVendorInput" type="text" placeholder="Preferred Vendor (optional)" style="padding:10px;border:1px solid #DADCE0;border-radius:8px;" />
+                            </div>
+                        <div style="display:flex;gap:8px;">
+                            <button id="saveReorderRuleBtn" class="btn-primary">Save Rule</button>
+                            <button id="clearReorderRuleBtn" style="background:#F1F3F4;color:#202124;border:none;padding:10px 16px;border-radius:8px;">Clear Rule</button>
+                        </div>
+                        <div id="reorderRulesList" style="margin-top:16px;"></div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="content-row" style="display:flex;gap:24px;align-items:flex-start;">
+                <!-- Left: Products list / Kanban -->
+                <div class="products-column" style="flex:1;">
+                    <div id="productsList"></div>
+                    <div id="productsKanban" class="kanban-view" style="display: none;"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -332,6 +422,19 @@
     <script>
         createSidebar('products.html');
         loadProductFilters();
+        // Dev: show seed button on localhost/file protocol and wire to seed function
+        (function() {
+            try {
+                const btn = document.getElementById('seed-demo-btn');
+                if (!btn) return;
+                const host = window.location.hostname;
+                if (host === 'localhost' || host === '127.0.0.1' || window.location.protocol === 'file:') {
+                    btn.style.display = 'inline-block';
+                    btn.addEventListener('click', function() { window.seedDemoData && window.seedDemoData(); });
+                }
+            } catch (e) { console.warn('Seed button init failed', e); }
+        })();
+    createSidebar('products.html');
         // Initialize view
         const savedView = localStorage.getItem('productsView') || 'list';
         if (savedView === 'kanban') {
@@ -340,6 +443,22 @@
             switchView('list');
         }
         loadProducts();
+        // Initialize additional management sections
+        if (typeof initProductManagementSections === 'function') {
+            initProductManagementSections();
+        }
+        // populate category filter
+        const catFilter = document.getElementById('categoryFilter');
+        if (catFilter) {
+            const cats = getCategories();
+            cats.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c;
+                catFilter.appendChild(opt);
+            });
+            catFilter.addEventListener('change', loadProducts);
+        }
     </script>
 </body>
 </html>

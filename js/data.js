@@ -411,6 +411,49 @@ function updateProductStock(productId, quantity, operation = 'add') {
     }
 }
 
+// Product update
+function updateProduct(productId, updates) {
+    const products = getProducts();
+    const index = products.findIndex(p => p.id === productId);
+    if (index === -1) return null;
+    products[index] = { ...products[index], ...updates };
+    saveProducts(products);
+    return products[index];
+}
+
+// Reordering rules (per product)
+function getReorderRules() {
+    return JSON.parse(localStorage.getItem('stockmaster_reorder_rules') || '{}');
+}
+
+function saveReorderRule(productId, rule) {
+    const rules = getReorderRules();
+    rules[productId] = rule;
+    localStorage.setItem('stockmaster_reorder_rules', JSON.stringify(rules));
+}
+
+function removeReorderRule(productId) {
+    const rules = getReorderRules();
+    delete rules[productId];
+    localStorage.setItem('stockmaster_reorder_rules', JSON.stringify(rules));
+}
+
+// Return products that are below their reorder point
+function getProductsBelowReorder() {
+    const rules = getReorderRules();
+    const products = getProducts();
+    const below = [];
+    products.forEach(p => {
+        const rule = rules[p.id];
+        if (rule && typeof rule.min === 'number') {
+            if (p.stock < rule.min) {
+                below.push({ product: p, rule });
+            }
+        }
+    });
+    return below;
+}
+
 // Receipt functions
 function getReceipts() {
     return JSON.parse(localStorage.getItem('stockmaster_receipts') || '[]');
