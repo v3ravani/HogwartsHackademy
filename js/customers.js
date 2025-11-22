@@ -5,19 +5,54 @@ let currentView = localStorage.getItem('customersView') || 'list';
 function loadCustomers() {
     const customers = getCustomers();
     const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+    const typeFilter = document.getElementById('filterType')?.value || '';
+    const statusFilter = document.getElementById('filterStatus')?.value || '';
+    const cityFilter = document.getElementById('filterCity')?.value || '';
     
-    const filteredCustomers = customers.filter(customer => 
-        customer.name.toLowerCase().includes(searchTerm) ||
-        customer.email.toLowerCase().includes(searchTerm) ||
-        customer.phone.toLowerCase().includes(searchTerm) ||
-        customer.city.toLowerCase().includes(searchTerm)
-    );
+    let filteredCustomers = customers.filter(customer => {
+        const matchesSearch = !searchTerm || 
+            customer.name.toLowerCase().includes(searchTerm) ||
+            customer.email.toLowerCase().includes(searchTerm) ||
+            customer.phone.toLowerCase().includes(searchTerm) ||
+            customer.city.toLowerCase().includes(searchTerm);
+        
+        const matchesType = !typeFilter || customer.type === typeFilter;
+        const matchesStatus = !statusFilter || customer.status === statusFilter;
+        const matchesCity = !cityFilter || customer.city === cityFilter;
+        
+        return matchesSearch && matchesType && matchesStatus && matchesCity;
+    });
     
     if (currentView === 'list') {
         displayCustomers(filteredCustomers);
     } else {
         displayCustomersKanban(filteredCustomers);
     }
+}
+
+function loadCustomerFilters() {
+    const customers = getCustomers();
+    const cities = [...new Set(customers.map(c => c.city))].filter(c => c).sort();
+    
+    const citySelect = document.getElementById('filterCity');
+    if (citySelect) {
+        cities.forEach(city => {
+            if (!Array.from(citySelect.options).some(opt => opt.value === city)) {
+                const option = document.createElement('option');
+                option.value = city;
+                option.textContent = city;
+                citySelect.appendChild(option);
+            }
+        });
+    }
+}
+
+function resetCustomerFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('filterType').value = '';
+    document.getElementById('filterStatus').value = '';
+    document.getElementById('filterCity').value = '';
+    loadCustomers();
 }
 
 function switchView(view) {

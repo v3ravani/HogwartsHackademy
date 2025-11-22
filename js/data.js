@@ -384,6 +384,12 @@ function addProduct(product) {
     if (!product.location) product.location = 'WH1';
     products.push(product);
     saveProducts(products);
+    
+    // Sync to MySQL (non-blocking)
+    if (typeof syncProduct === 'function') {
+        syncProduct(product).catch(() => {}); // Silent fail
+    }
+    
     return product;
 }
 
@@ -397,6 +403,11 @@ function updateProductStock(productId, quantity, operation = 'add') {
             product.stock = Math.max(0, product.stock - quantity);
         }
         saveProducts(products);
+        
+        // Sync to MySQL (non-blocking)
+        if (typeof syncProduct === 'function') {
+            syncProduct(product).catch(() => {}); // Silent fail
+        }
     }
 }
 
@@ -426,6 +437,11 @@ function addReceipt(receipt) {
         location: receipt.warehouse || 'WH1',
         details: `Receipt #${receipt.id} from ${receipt.supplier}`
     });
+    
+    // Sync to MySQL (non-blocking)
+    if (typeof syncReceipt === 'function') {
+        syncReceipt(receipt).catch(() => {}); // Silent fail
+    }
     
     return receipt;
 }
@@ -457,6 +473,11 @@ function addDelivery(delivery) {
         details: `Delivery #${delivery.id} to ${delivery.customer}`
     });
     
+    // Sync to MySQL (non-blocking)
+    if (typeof syncDelivery === 'function') {
+        syncDelivery(delivery).catch(() => {}); // Silent fail
+    }
+    
     return delivery;
 }
 
@@ -483,6 +504,11 @@ function addTransfer(transfer) {
             // For simplicity, we'll just update the location
             product.location = transfer.toLocation;
             saveProducts(products);
+            
+            // Sync product to MySQL (non-blocking)
+            if (typeof syncProduct === 'function') {
+                syncProduct(product).catch(() => {}); // Silent fail
+            }
         }
     });
     
@@ -494,6 +520,11 @@ function addTransfer(transfer) {
         location: `${transfer.fromLocation} → ${transfer.toLocation}`,
         details: `Transfer #${transfer.id}`
     });
+    
+    // Sync to MySQL (non-blocking)
+    if (typeof syncTransfer === 'function') {
+        syncTransfer(transfer).catch(() => {}); // Silent fail
+    }
     
     return transfer;
 }
@@ -519,6 +550,11 @@ function addAdjustment(adjustment) {
         product.stock = adjustment.physicalCount;
         saveProducts(products);
         
+        // Sync product to MySQL (non-blocking)
+        if (typeof syncProduct === 'function') {
+            syncProduct(product).catch(() => {}); // Silent fail
+        }
+        
         // Add to history
         addToHistory({
             type: 'Adjustment',
@@ -527,6 +563,11 @@ function addAdjustment(adjustment) {
             location: adjustment.location,
             details: `Adjustment #${adjustment.id}: System ${systemStock} → Physical ${adjustment.physicalCount} (${difference > 0 ? '+' : ''}${difference})`
         });
+    }
+    
+    // Sync to MySQL (non-blocking)
+    if (typeof syncAdjustment === 'function') {
+        syncAdjustment(adjustment).catch(() => {}); // Silent fail
     }
     
     return adjustment;
@@ -555,6 +596,11 @@ function addWarehouse(warehouse) {
     if (!warehouses.includes(warehouse)) {
         warehouses.push(warehouse);
         localStorage.setItem('stockmaster_warehouses', JSON.stringify(warehouses));
+        
+        // Sync to MySQL (non-blocking)
+        if (typeof syncWarehouse === 'function') {
+            syncWarehouse(warehouse).catch(() => {}); // Silent fail
+        }
     }
 }
 
@@ -562,6 +608,11 @@ function removeWarehouse(warehouse) {
     const warehouses = getWarehouses();
     const filtered = warehouses.filter(w => w !== warehouse);
     localStorage.setItem('stockmaster_warehouses', JSON.stringify(filtered));
+    
+    // Sync to MySQL (non-blocking)
+    if (typeof deleteWarehouseFromMySQL === 'function') {
+        deleteWarehouseFromMySQL(warehouse).catch(() => {}); // Silent fail
+    }
 }
 
 // Category functions
@@ -574,6 +625,11 @@ function addCategory(category) {
     if (!categories.includes(category)) {
         categories.push(category);
         localStorage.setItem('stockmaster_categories', JSON.stringify(categories));
+        
+        // Sync to MySQL (non-blocking)
+        if (typeof syncCategory === 'function') {
+            syncCategory(category).catch(() => {}); // Silent fail
+        }
     }
 }
 
@@ -581,6 +637,11 @@ function removeCategory(category) {
     const categories = getCategories();
     const filtered = categories.filter(c => c !== category);
     localStorage.setItem('stockmaster_categories', JSON.stringify(filtered));
+    
+    // Sync to MySQL (non-blocking)
+    if (typeof deleteCategoryFromMySQL === 'function') {
+        deleteCategoryFromMySQL(category).catch(() => {}); // Silent fail
+    }
 }
 
 // Customer functions
@@ -599,6 +660,12 @@ function addCustomer(customer) {
     customer.status = customer.status || 'Active';
     customers.push(customer);
     saveCustomers(customers);
+    
+    // Sync to MySQL (non-blocking)
+    if (typeof syncCustomer === 'function') {
+        syncCustomer(customer).catch(() => {}); // Silent fail
+    }
+    
     return customer;
 }
 
@@ -608,6 +675,12 @@ function updateCustomer(customerId, updates) {
     if (index !== -1) {
         customers[index] = { ...customers[index], ...updates };
         saveCustomers(customers);
+        
+        // Sync to MySQL (non-blocking)
+        if (typeof syncCustomer === 'function') {
+            syncCustomer(customers[index]).catch(() => {}); // Silent fail
+        }
+        
         return customers[index];
     }
     return null;
@@ -617,10 +690,14 @@ function deleteCustomer(customerId) {
     const customers = getCustomers();
     const filtered = customers.filter(c => c.id !== customerId);
     saveCustomers(filtered);
+    
+    // Sync to MySQL (non-blocking)
+    if (typeof deleteCustomerFromMySQL === 'function') {
+        deleteCustomerFromMySQL(customerId).catch(() => {}); // Silent fail
+    }
 }
 
 // Initialize on load
 if (typeof window !== 'undefined') {
     initializeData();
 }
-

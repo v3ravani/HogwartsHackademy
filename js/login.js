@@ -1,9 +1,5 @@
 // StockMaster - Authentication Logic
 
-// Hardcoded credentials
-const VALID_USER_ID = 'team123';
-const VALID_PASSWORD = 'pass123';
-
 function checkAuth() {
     const isAuthenticated = localStorage.getItem('stockmaster_authenticated') === 'true';
     if (!isAuthenticated && !window.location.pathname.includes('login.html') && !window.location.pathname.includes('signup.html')) {
@@ -11,13 +7,26 @@ function checkAuth() {
     }
 }
 
-function login(userId, password) {
-    if (userId === VALID_USER_ID && password === VALID_PASSWORD) {
-        localStorage.setItem('stockmaster_authenticated', 'true');
-        localStorage.setItem('stockmaster_user', userId);
-        return true;
+function getStoredUsers() {
+    try {
+        const raw = localStorage.getItem('stockmaster_users');
+        return raw ? JSON.parse(raw) : [];
+    } catch (_) {
+        return [];
     }
-    return false;
+}
+
+function setStoredUsers(users) {
+    localStorage.setItem('stockmaster_users', JSON.stringify(users));
+}
+
+async function login(userId, password) {
+    const users = getStoredUsers();
+    const user = users.find(u => u && u.user_id === userId && u.password === password);
+    if (!user) return false;
+    localStorage.setItem('stockmaster_authenticated', 'true');
+    localStorage.setItem('stockmaster_user', user.user_id);
+    return true;
 }
 
 function logout() {
@@ -37,4 +46,3 @@ if (typeof window !== 'undefined') {
         checkAuth();
     }
 }
-
