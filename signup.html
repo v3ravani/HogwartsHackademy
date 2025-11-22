@@ -11,7 +11,7 @@
             box-sizing: border-box;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(135deg, #1A73E8 0%, #185ABC 100%);
             min-height: 100vh;
             display: flex;
@@ -21,24 +21,32 @@
         }
         .signup-container {
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
+            padding: 48px 40px;
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .logo {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 36px;
         }
         .logo h1 {
             color: #1A73E8;
-            font-size: 32px;
-            margin-bottom: 10px;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
         .logo p {
-            color: #666;
+            color: #5F6368;
             font-size: 14px;
+            font-weight: 400;
         }
         .form-group {
             margin-bottom: 20px;
@@ -46,50 +54,61 @@
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            color: #1F1F1F;
+            color: #3C4043;
             font-weight: 500;
-            font-size: 14px;
+            font-size: 13px;
+            letter-spacing: 0.1px;
         }
         .form-group input {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #E0E0E0;
+            padding: 12px 14px;
+            border: 1px solid #DADCE0;
             border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            background: #FAFAFA;
+            color: #202124;
         }
         .form-group input:focus {
             outline: none;
             border-color: #1A73E8;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
         }
         .btn-primary {
             width: 100%;
-            padding: 12px;
+            padding: 13px 24px;
             background: #1A73E8;
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
         }
         .btn-primary:hover {
-            background: #185ABC;
+            background: #1557B0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
+        }
+        .btn-primary:active {
+            transform: translateY(1px);
         }
         .login-link {
             text-align: center;
-            margin-top: 20px;
-            color: #666;
+            margin-top: 24px;
+            color: #5F6368;
             font-size: 14px;
         }
         .login-link a {
             color: #1A73E8;
             text-decoration: none;
             font-weight: 500;
+            transition: color 0.2s ease;
         }
         .login-link a:hover {
-            text-decoration: underline;
+            color: #1557B0;
         }
     </style>
 </head>

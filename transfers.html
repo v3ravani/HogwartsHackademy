@@ -11,9 +11,10 @@
             box-sizing: border-box;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #F4F6F9;
-            color: #1F1F1F;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #F8F9FA;
+            color: #202124;
+            line-height: 1.5;
         }
         .container {
             display: flex;
@@ -22,7 +23,7 @@
         #sidebar {
             width: 260px;
             background: white;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            box-shadow: 1px 0 0 rgba(0, 0, 0, 0.06);
             position: fixed;
             height: 100vh;
             overflow-y: auto;
@@ -30,38 +31,45 @@
         .main-content {
             margin-left: 260px;
             flex: 1;
-            padding: 30px;
+            padding: 32px 40px;
+            max-width: 1400px;
         }
         .page-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 32px;
         }
         .page-header h1 {
-            font-size: 28px;
-            color: #1F1F1F;
+            font-size: 32px;
+            font-weight: 400;
+            color: #202124;
+            letter-spacing: -0.5px;
         }
         .btn-primary {
             background: #1A73E8;
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 10px 20px;
             border-radius: 8px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.2s ease;
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
         }
         .btn-primary:hover {
-            background: #185ABC;
+            background: #1557B0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
         }
         #transfersList {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
         }
     </style>
 </head>
