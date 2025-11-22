@@ -183,6 +183,23 @@
             background: rgba(249, 171, 0, 0.1);
             color: #F9AB00;
         }
+        .btn-secondary {
+            background: #F1F3F4;
+            color: #202124;
+            border: 1px solid #DADCE0;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .btn-secondary:hover { background: #E8EAED; }
     </style>
 </head>
 <body>
@@ -191,6 +208,9 @@
         <div class="main-content">
             <div class="page-header">
                 <h1>Stock Overview</h1>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button class="btn-secondary" onclick="exportStockCSV()" title="Export as CSV">⭳ Export CSV</button>
+                </div>
             </div>
             
             <div class="stats-grid">
@@ -259,6 +279,7 @@
     </div>
 
     <script src="js/data.js"></script>
+    <script src="js/mysql-sync.js"></script>
     <script src="js/login.js"></script>
     <script src="js/navigation.js"></script>
     <script src="js/chatbot.js"></script>

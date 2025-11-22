@@ -1,6 +1,14 @@
 -- StockMaster Inventory Management System - MySQL Database Schema
 -- Created for migration from localStorage to MySQL
 
+-- Step 1: Create the database (if it doesn't exist)
+CREATE DATABASE IF NOT EXISTS stockmaster 
+CHARACTER SET utf8mb4 
+COLLATE utf8mb4_unicode_ci;
+
+-- Step 2: Use the database
+USE stockmaster;
+
 -- Drop existing tables if they exist (for clean setup)
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS move_history;

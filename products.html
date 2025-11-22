@@ -146,10 +146,106 @@
             background: #1557B0;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
         }
+        .btn-secondary {
+            background: #F1F3F4;
+            color: #202124;
+            border: 1px solid #DADCE0;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .btn-secondary:hover { background: #E8EAED; }
         #productsList {
             display: flex;
             flex-direction: column;
             gap: 12px;
+        }
+        .filters-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+            margin-bottom: 24px;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+        .filters-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #202124;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            align-items: end;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .filter-group label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #5F6368;
+        }
+        .filter-group select {
+            padding: 10px 14px;
+            border: 1px solid #DADCE0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #FAFAFA;
+            color: #202124;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .filter-group select:focus {
+            outline: none;
+            border-color: #1A73E8;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+        }
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-filter {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+        .btn-filter.apply {
+            background: #1A73E8;
+            color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+        }
+        .btn-filter.apply:hover {
+            background: #1557B0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
+        }
+        .btn-filter.reset {
+            background: #F1F3F4;
+            color: #202124;
+            border: 1px solid #DADCE0;
+        }
+        .btn-filter.reset:hover {
+            background: #E8EAED;
         }
     </style>
 </head>
@@ -159,7 +255,10 @@
         <div class="main-content">
             <div class="page-header">
                 <h1>Products</h1>
-                <a href="create_product.html" class="btn-primary">+ Add Product</a>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button class="btn-secondary" onclick="exportProductsCSV()" title="Export as CSV">⭳ Export CSV</button>
+                    <a href="create_product.html" class="btn-primary">+ Add Product</a>
+                </div>
             </div>
             
             <div class="search-bar">
@@ -186,18 +285,53 @@
                 </div>
             </div>
             
+            <div class="filters-section">
+                <h3>🔍 Filters</h3>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>Category</label>
+                        <select id="filterCategory" onchange="loadProducts()">
+                            <option value="">All Categories</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Location</label>
+                        <select id="filterLocation" onchange="loadProducts()">
+                            <option value="">All Locations</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Stock Level</label>
+                        <select id="filterStock" onchange="loadProducts()">
+                            <option value="">All Stock</option>
+                            <option value="low">Low Stock (< 10)</option>
+                            <option value="medium">Medium (10-50)</option>
+                            <option value="high">High (> 50)</option>
+                            <option value="out">Out of Stock</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <div class="filter-actions">
+                            <button class="btn-filter reset" onclick="resetProductFilters()">Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <div id="productsList" class="list-view"></div>
             <div id="productsKanban" class="kanban-view" style="display: none;"></div>
         </div>
     </div>
 
     <script src="js/data.js"></script>
+    <script src="js/mysql-sync.js"></script>
     <script src="js/login.js"></script>
     <script src="js/navigation.js"></script>
     <script src="js/chatbot.js"></script>
     <script src="js/products.js"></script>
     <script>
         createSidebar('products.html');
+        loadProductFilters();
         // Initialize view
         const savedView = localStorage.getItem('productsView') || 'list';
         if (savedView === 'kanban') {

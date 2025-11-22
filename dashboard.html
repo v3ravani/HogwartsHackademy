@@ -12,8 +12,8 @@
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #F8F9FA;
-            color: #202124;
+            background: var(--bg);
+            color: var(--text);
             line-height: 1.5;
         }
         .container {
@@ -22,8 +22,8 @@
         }
         #sidebar {
             width: 260px;
-            background: white;
-            box-shadow: 1px 0 0 rgba(0, 0, 0, 0.06);
+            background: var(--card);
+            box-shadow: 1px 0 0 var(--border);
             position: fixed;
             height: 100vh;
             overflow-y: auto;
@@ -44,12 +44,12 @@
         .page-header h1 {
             font-size: 32px;
             font-weight: 400;
-            color: #202124;
+            color: var(--text);
             margin-bottom: 8px;
             letter-spacing: -0.5px;
         }
         .page-header p {
-            color: #5F6368;
+            color: var(--muted);
             font-size: 14px;
             font-weight: 400;
         }
@@ -60,20 +60,20 @@
             margin-bottom: 32px;
         }
         .kpi-card {
-            background: white;
+            background: var(--card);
             border-radius: 12px;
             padding: 24px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
-            transition: all 0.2s ease;
-            border: 1px solid rgba(0, 0, 0, 0.04);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid var(--border);
         }
         .kpi-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
             transform: translateY(-2px);
         }
         .kpi-card h3 {
             font-size: 13px;
-            color: #5F6368;
+            color: var(--muted);
             margin-bottom: 16px;
             font-weight: 500;
             text-transform: uppercase;
@@ -82,7 +82,7 @@
         .kpi-card .value {
             font-size: 36px;
             font-weight: 400;
-            color: #202124;
+            color: var(--text);
             margin-bottom: 4px;
             line-height: 1.2;
         }
@@ -98,18 +98,18 @@
             background: rgba(26, 115, 232, 0.08);
         }
         .filters-section {
-            background: white;
+            background: var(--card);
             border-radius: 12px;
             padding: 24px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
             margin-bottom: 32px;
-            border: 1px solid rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--border);
         }
         .filters-section h2 {
             font-size: 16px;
             font-weight: 500;
             margin-bottom: 20px;
-            color: #202124;
+            color: var(--text);
             letter-spacing: -0.2px;
         }
         .filters-grid {
@@ -123,27 +123,27 @@
         }
         .filter-group label {
             font-size: 13px;
-            color: #5F6368;
+            color: var(--muted);
             margin-bottom: 8px;
             font-weight: 500;
         }
         .filter-group select {
             padding: 10px 12px;
-            border: 1px solid #DADCE0;
+            border: 1px solid var(--border);
             border-radius: 8px;
             font-size: 14px;
-            background: white;
+            background: var(--card);
             cursor: pointer;
             transition: all 0.2s ease;
-            color: #202124;
+            color: var(--text);
         }
         .filter-group select:focus {
             outline: none;
-            border-color: #1A73E8;
-            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.12);
         }
         .btn-primary {
-            background: #1A73E8;
+            background: var(--primary);
             color: white;
             border: none;
             padding: 10px 20px;
@@ -155,7 +155,7 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
         }
         .btn-primary:hover {
-            background: #1557B0;
+            background: var(--primary-hover);
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
         }
         .clock-widget {
@@ -188,11 +188,11 @@
             margin-bottom: 32px;
         }
         .widget-card {
-            background: white;
+            background: var(--card);
             border-radius: 12px;
             padding: 24px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(0, 0, 0, 0.04);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--border);
             transition: all 0.2s ease;
         }
         .widget-card:hover {
@@ -203,7 +203,7 @@
             font-size: 16px;
             font-weight: 500;
             margin-bottom: 16px;
-            color: #202124;
+            color: var(--text);
             letter-spacing: -0.2px;
         }
         .recent-activity {
@@ -211,7 +211,7 @@
         }
         .recent-activity li {
             padding: 12px 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             gap: 12px;
@@ -235,11 +235,11 @@
         .activity-content p {
             margin: 0;
             font-size: 14px;
-            color: #202124;
+            color: var(--text);
         }
         .activity-content span {
             font-size: 12px;
-            color: #5F6368;
+            color: var(--muted);
         }
         .stats-row {
             display: grid;
@@ -250,18 +250,18 @@
         .stat-item {
             text-align: center;
             padding: 12px;
-            background: rgba(0, 0, 0, 0.02);
+            background: rgba(0, 0, 0, 0.04);
             border-radius: 8px;
         }
         .stat-item .value {
             font-size: 24px;
             font-weight: 500;
-            color: #202124;
+            color: var(--text);
             margin-bottom: 4px;
         }
         .stat-item .label {
             font-size: 11px;
-            color: #5F6368;
+            color: var(--muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -272,35 +272,32 @@
             margin-bottom: 32px;
         }
         .chart-card {
-            background: white;
+            background: var(--card);
             border-radius: 12px;
             padding: 24px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(0, 0, 0, 0.04);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--border);
             transition: all 0.2s ease;
         }
         .chart-card:hover {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
             transform: translateY(-2px);
         }
-        .chart-card.large {
-            grid-column: span 1;
-        }
         .chart-header {
             margin-bottom: 20px;
             padding-bottom: 16px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            border-bottom: 1px solid var(--border);
         }
         .chart-header h3 {
             font-size: 18px;
             font-weight: 500;
             margin-bottom: 4px;
-            color: #202124;
+            color: var(--text);
             letter-spacing: -0.2px;
         }
         .chart-subtitle {
             font-size: 12px;
-            color: #5F6368;
+            color: var(--muted);
         }
         .chart-container {
             min-height: 250px;
@@ -308,22 +305,19 @@
             align-items: center;
             justify-content: center;
         }
-        .widgets-grid.expanded {
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        }
         .widget-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 16px;
             padding-bottom: 12px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            border-bottom: 1px solid var(--border);
         }
         .widget-header h3 {
             margin: 0;
             font-size: 16px;
             font-weight: 500;
-            color: #202124;
+            color: var(--text);
             letter-spacing: -0.2px;
         }
         .alert-badge, .notification-badge {
@@ -337,14 +331,14 @@
             text-align: center;
         }
         .notification-badge {
-            background: #1A73E8;
+            background: var(--primary);
         }
         .top-item {
             display: flex;
             align-items: center;
             gap: 12px;
             padding: 12px 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            border-bottom: 1px solid var(--border);
         }
         .top-item:last-child {
             border-bottom: none;
@@ -368,17 +362,17 @@
         .top-item-content p {
             margin: 0 0 2px 0;
             font-size: 14px;
-            color: #202124;
+            color: var(--text);
             font-weight: 500;
         }
         .top-item-content span {
             font-size: 12px;
-            color: #5F6368;
+            color: var(--muted);
         }
         .top-item-value {
             font-size: 14px;
             font-weight: 600;
-            color: #202124;
+            color: var(--text);
         }
         .quick-actions {
             display: grid;
@@ -438,13 +432,14 @@
     </style>
 </head>
 <body>
+    <script src="js/theme.js"></script>
     <div class="container">
         <div id="sidebar"></div>
         <div class="main-content">
             <div class="page-header">
                 <div>
                     <h1>Dashboard</h1>
-                    <p style="color: #5F6368; margin-top: 8px;">Welcome back! Here's your inventory overview.</p>
+                    <p style="color: var(--muted); margin-top: 8px;">Welcome back! Here's your inventory overview.</p>
                 </div>
                 <div class="clock-widget" id="clockWidget"></div>
             </div>
@@ -613,6 +608,7 @@
     </div>
 
     <script src="js/data.js"></script>
+    <script src="js/mysql-sync.js"></script>
     <script src="js/login.js"></script>
     <script src="js/navigation.js"></script>
     <script src="js/charts.js"></script>

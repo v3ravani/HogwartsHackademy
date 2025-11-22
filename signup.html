@@ -12,100 +12,266 @@
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #1A73E8 0%, #185ABC 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #1A73E8 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
         }
         .signup-container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
-            padding: 48px 40px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2);
+            padding: 56px 48px;
             width: 100%;
-            max-width: 420px;
-            animation: fadeIn 0.3s ease;
+            max-width: 480px;
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            z-index: 1;
+            max-height: 90vh;
+            overflow-y: auto;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .signup-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .signup-container::-webkit-scrollbar-track {
+            background: #F1F3F4;
+            border-radius: 4px;
+        }
+        .signup-container::-webkit-scrollbar-thumb {
+            background: #DADCE0;
+            border-radius: 4px;
+        }
+        .signup-container::-webkit-scrollbar-thumb:hover {
+            background: #9AA0A6;
+        }
+        @keyframes slideUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px) scale(0.95); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
         }
         .logo {
             text-align: center;
-            margin-bottom: 36px;
+            margin-bottom: 40px;
+        }
+        .logo-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #1A73E8 0%, #185ABC 100%);
+            border-radius: 16px;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            box-shadow: 0 8px 16px rgba(26, 115, 232, 0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
         }
         .logo h1 {
             color: #1A73E8;
-            font-size: 28px;
-            font-weight: 600;
+            font-size: 32px;
+            font-weight: 700;
             margin-bottom: 8px;
-            letter-spacing: -0.5px;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #1A73E8 0%, #185ABC 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         .logo p {
             color: #5F6368;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 400;
         }
         .form-group {
             margin-bottom: 20px;
+            position: relative;
         }
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             color: #3C4043;
-            font-weight: 500;
-            font-size: 13px;
+            font-weight: 600;
+            font-size: 14px;
             letter-spacing: 0.1px;
+        }
+        .input-wrapper {
+            position: relative;
+        }
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9AA0A6;
+            font-size: 18px;
+            pointer-events: none;
+            transition: color 0.2s ease;
         }
         .form-group input {
             width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #DADCE0;
-            border-radius: 8px;
+            padding: 14px 16px 14px 48px;
+            border: 2px solid #E8EAED;
+            border-radius: 12px;
             font-size: 15px;
-            transition: all 0.2s ease;
-            background: #FAFAFA;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #F8F9FA;
             color: #202124;
         }
         .form-group input:focus {
             outline: none;
             border-color: #1A73E8;
             background: white;
-            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+            box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.1), 0 4px 12px rgba(26, 115, 232, 0.15);
+            transform: translateY(-1px);
+        }
+        .form-group input:focus + .input-icon {
+            color: #1A73E8;
+        }
+        .password-strength {
+            margin-top: 8px;
+            height: 4px;
+            background: #E8EAED;
+            border-radius: 2px;
+            overflow: hidden;
+            display: none;
+        }
+        .password-strength.show {
+            display: block;
+        }
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            background: #D32F2F;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+        .password-strength-bar.weak {
+            width: 33%;
+            background: #D32F2F;
+        }
+        .password-strength-bar.medium {
+            width: 66%;
+            background: #F9AB00;
+        }
+        .password-strength-bar.strong {
+            width: 100%;
+            background: #1DB954;
+        }
+        .error-message {
+            background: linear-gradient(135deg, #FCE8E6 0%, #FADBD8 100%);
+            color: #C5221F;
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            display: none;
+            border-left: 4px solid #C5221F;
+            box-shadow: 0 2px 8px rgba(197, 34, 31, 0.1);
+            animation: shake 0.4s ease;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        .error-message.show {
+            display: block;
         }
         .btn-primary {
             width: 100%;
-            padding: 13px 24px;
-            background: #1A73E8;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #1A73E8 0%, #185ABC 100%);
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 500;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+            position: relative;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        .btn-primary:hover::before {
+            width: 300px;
+            height: 300px;
         }
         .btn-primary:hover {
-            background: #1557B0;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(26, 115, 232, 0.4);
         }
         .btn-primary:active {
-            transform: translateY(1px);
+            transform: translateY(0);
+        }
+        .btn-primary span {
+            position: relative;
+            z-index: 1;
         }
         .login-link {
             text-align: center;
-            margin-top: 24px;
+            margin-top: 32px;
             color: #5F6368;
             font-size: 14px;
         }
         .login-link a {
             color: #1A73E8;
             text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s ease;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .login-link a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #1A73E8;
+            transition: width 0.3s ease;
+        }
+        .login-link a:hover::after {
+            width: 100%;
         }
         .login-link a:hover {
             color: #1557B0;
@@ -115,53 +281,137 @@
 <body>
     <div class="signup-container">
         <div class="logo">
+            <div class="logo-icon">📦</div>
             <h1>StockMaster</h1>
             <p>Create Your Account</p>
         </div>
+        <div class="error-message" id="errorMessage"></div>
         <form id="signupForm">
             <div class="form-group">
                 <label for="fullName">Full Name</label>
-                <input type="text" id="fullName" name="fullName" required>
+                <div class="input-wrapper">
+                    <input type="text" id="fullName" name="fullName" required placeholder="Enter your full name">
+                    <span class="input-icon">👤</span>
+                </div>
             </div>
             <div class="form-group">
                 <label for="userId">User ID</label>
-                <input type="text" id="userId" name="userId" required>
+                <div class="input-wrapper">
+                    <input type="text" id="userId" name="userId" required placeholder="Choose a user ID">
+                    <span class="input-icon">🆔</span>
+                </div>
             </div>
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
+                <div class="input-wrapper">
+                    <input type="email" id="email" name="email" required placeholder="Enter your email">
+                    <span class="input-icon">✉️</span>
+                </div>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
+                <div class="input-wrapper">
+                    <input type="password" id="password" name="password" required placeholder="Create a password">
+                    <span class="input-icon">🔒</span>
+                </div>
+                <div class="password-strength" id="passwordStrength">
+                    <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                </div>
             </div>
             <div class="form-group">
                 <label for="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required>
+                <div class="input-wrapper">
+                    <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Confirm your password">
+                    <span class="input-icon">🔒</span>
+                </div>
             </div>
-            <button type="submit" class="btn-primary">Sign Up</button>
+            <button type="submit" class="btn-primary">
+                <span>Create Account</span>
+            </button>
         </form>
         <div class="login-link">
             Already have an account? <a href="login.html">Login</a>
         </div>
     </div>
 
+    <script src="js/theme.js"></script>
     <script>
+        const passwordInput = document.getElementById('password');
+        const passwordStrength = document.getElementById('passwordStrength');
+        const passwordStrengthBar = document.getElementById('passwordStrengthBar');
+        
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            if (password.length === 0) {
+                passwordStrength.classList.remove('show');
+                return;
+            }
+            passwordStrength.classList.add('show');
+            
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^a-zA-Z0-9]/)) strength++;
+            
+            passwordStrengthBar.className = 'password-strength-bar';
+            if (strength <= 1) {
+                passwordStrengthBar.classList.add('weak');
+            } else if (strength === 2) {
+                passwordStrengthBar.classList.add('medium');
+            } else {
+                passwordStrengthBar.classList.add('strong');
+            }
+        });
+        
         document.getElementById('signupForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
+            const errorMessage = document.getElementById('errorMessage');
+            const btn = document.querySelector('.btn-primary');
+            const name = document.getElementById('fullName').value;
+            const userId = document.getElementById('userId').value;
+            const email = document.getElementById('email').value;
             
             if (password !== confirmPassword) {
-                alert('Passwords do not match');
+                errorMessage.textContent = 'Passwords do not match. Please try again.';
+                errorMessage.classList.add('show');
+                setTimeout(() => { errorMessage.classList.remove('show'); }, 4000);
                 return;
             }
             
-            // Fake submission - just redirect to login
-            alert('Sign up successful! Please login.');
-            window.location.href = 'login.html';
+            if (password.length < 6) {
+                errorMessage.textContent = 'Password must be at least 6 characters long.';
+                errorMessage.classList.add('show');
+                setTimeout(() => { errorMessage.classList.remove('show'); }, 4000);
+                return;
+            }
+            
+            btn.style.opacity = '0.7';
+            btn.style.pointerEvents = 'none';
+            btn.innerHTML = '<span>Creating Account...</span>';
+            
+            try {
+                const raw = localStorage.getItem('stockmaster_users');
+                const users = raw ? JSON.parse(raw) : [];
+                if (users.find(u => u && u.user_id === userId)) {
+                    throw new Error('User ID already exists');
+                }
+                users.push({ user_id: userId, password, name, email });
+                localStorage.setItem('stockmaster_users', JSON.stringify(users));
+                btn.innerHTML = '<span>✓ Account Created!</span>';
+                btn.style.background = 'linear-gradient(135deg, #1DB954 0%, #1AA34A 100%)';
+                setTimeout(() => { window.location.href = 'login.html'; }, 700);
+            } catch (err) {
+                errorMessage.textContent = err.message === 'User ID already exists' ? 'User ID already exists. Choose another.' : 'Could not create account. Please try again.';
+                errorMessage.classList.add('show');
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+                btn.innerHTML = '<span>Create Account</span>';
+                setTimeout(() => { errorMessage.classList.remove('show'); }, 4000);
+            }
         });
     </script>
 </body>
 </html>
-
