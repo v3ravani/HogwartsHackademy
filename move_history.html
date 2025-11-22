@@ -49,6 +49,35 @@
             font-weight: 400;
             margin-top: 8px;
         }
+        .search-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+        .search-bar input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #DADCE0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background: #FAFAFA;
+            color: #202124;
+        }
+        .search-bar input:focus {
+            outline: none;
+            border-color: #1A73E8;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+        }
+        .search-bar input::placeholder {
+            color: #9AA0A6;
+        }
         #historyList {
             display: flex;
             flex-direction: column;
@@ -63,6 +92,10 @@
             <div class="page-header">
                 <h1>Move History</h1>
                 <p style="color: #666; margin-top: 8px;">Chronological log of all inventory movements</p>
+            </div>
+            
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search history by product, type, location..." onkeyup="loadHistory()">
             </div>
             
             <div id="historyList"></div>
